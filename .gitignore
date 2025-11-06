@@ -1,0 +1,25 @@
+# Node
+node_modules/
+.env
+.env.development.local
+
+# Vite/CRA build
+dist/
+build/
+
+# Mac / Windows
+.DS_Store
+Thumbs.db
+
+# Firebase Admin SDK サービスアカウント鍵ファイル
+backend/serviceAccountKey.json
+encoded.txt
+
+MEMO.md
+面談練習.md
+日誌.md
+スケジュール.md
+構造図.md
+README.md
+ポートフォリオ.md
+コード練習.js
