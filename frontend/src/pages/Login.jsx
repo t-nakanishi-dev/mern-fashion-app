@@ -67,67 +67,73 @@ const Login = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-12 p-6 border rounded shadow">
-      <h2 className="text-2xl font-bold mb-6">ログイン</h2>
-
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
-        <div>
-          <input
-            type="email"
-            placeholder="メールアドレス"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className={`p-2 border rounded w-full
-    bg-white text-gray-800 placeholder-gray-400
-    dark:bg-gray-700 dark:text-white dark:placeholder-gray-300
-    ${
-      errors.email
-        ? "border-red-500 dark:border-red-400"
-        : "border-gray-300 dark:border-gray-600"
-    }`}
-          />
-
-          {errors.email && (
-            <p className="text-red-600 text-sm mt-1">{errors.email}</p>
-          )}
-        </div>
-
-        <div>
-          <input
-            type="password"
-            placeholder="パスワード"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className={`p-2 border rounded w-full
-    bg-white text-gray-800 placeholder-gray-400
-    dark:bg-gray-700 dark:text-white dark:placeholder-gray-300
-    ${
-      errors.password
-        ? "border-red-500 dark:border-red-400"
-        : "border-gray-300 dark:border-gray-600"
-    }`}
-          />
-
-          {errors.password && (
-            <p className="text-red-600 text-sm mt-1">{errors.password}</p>
-          )}
-        </div>
-
-        <button
-          type="submit"
-          className="bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 dark:hover:bg-indigo-500"
-        >
+    <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100 dark:bg-gray-800 p-4">
+      <div className="w-full max-w-md p-6 border rounded shadow bg-white dark:bg-gray-700">
+        <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
           ログイン
-        </button>
+        </h2>
 
-        <p className="text-sm">
-          アカウントをお持ちでない方は{" "}
-          <Link to="/signup" className="text-blue-600 hover:underline">
-            こちら
-          </Link>{" "}
-          から登録してください。
-        </p>
-      </form>
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col gap-4"
+          noValidate
+        >
+          <div>
+            <input
+              type="email"
+              placeholder="メールアドレス"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className={`p-2 border rounded w-full
+      bg-white text-gray-800 placeholder-gray-400
+      dark:bg-gray-700 dark:text-white dark:placeholder-gray-300
+      ${
+        errors.email
+          ? "border-red-500 dark:border-red-400"
+          : "border-gray-300 dark:border-gray-600"
+      }`}
+            />
+            {errors.email && (
+              <p className="text-red-600 text-sm mt-1">{errors.email}</p>
+            )}
+          </div>
+
+          <div>
+            <input
+              type="password"
+              placeholder="パスワード"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={`p-2 border rounded w-full
+      bg-white text-gray-800 placeholder-gray-400
+      dark:bg-gray-700 dark:text-white dark:placeholder-gray-300
+      ${
+        errors.password
+          ? "border-red-500 dark:border-red-400"
+          : "border-gray-300 dark:border-gray-600"
+      }`}
+            />
+            {errors.password && (
+              <p className="text-red-600 text-sm mt-1">{errors.password}</p>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            className="bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 dark:hover:bg-indigo-500"
+          >
+            ログイン
+          </button>
+
+          <p className="text-sm text-gray-900 dark:text-white">
+            アカウントをお持ちでない方は{" "}
+            <Link to="/signup" className="text-blue-600 hover:underline">
+              こちら
+            </Link>{" "}
+            から登録してください。
+          </p>
+        </form>
+      </div>
     </div>
   );
 };

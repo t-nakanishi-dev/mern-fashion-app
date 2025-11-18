@@ -59,20 +59,25 @@ const Header = ({ handleLogout, userName, userRole }) => {
             {userName ? `ようこそ、${userName}さん！` : "ようこそ！"}
           </span>
 
-          <Link
-            to="/profile"
-            className="bg-yellow-500 text-white px-3 py-1.5 rounded hover:bg-yellow-600 text-sm sm:text-base"
-          >
-            👤 プロフィール
-          </Link>
+          {/* ログイン中のみ表示 */}
+          {userName && (
+            <>
+              <Link
+                to="/profile"
+                className="bg-yellow-500 text-white px-3 py-1.5 rounded hover:bg-yellow-600 text-sm sm:text-base"
+              >
+                👤 プロフィール
+              </Link>
 
-          {userRole === "admin" && (
-            <Link
-              to="/admin"
-              className="bg-red-600 text-white px-3 py-1.5 rounded hover:bg-red-700 text-sm sm:text-base"
-            >
-              ⚙️ 管理者ページ
-            </Link>
+              {userRole === "admin" && (
+                <Link
+                  to="/admin"
+                  className="bg-red-600 text-white px-3 py-1.5 rounded hover:bg-red-700 text-sm sm:text-base"
+                >
+                  ⚙️ 管理者ページ
+                </Link>
+              )}
+            </>
           )}
 
           <Link
@@ -94,26 +99,35 @@ const Header = ({ handleLogout, userName, userRole }) => {
             )}
           </Link>
 
-          <Link
-            to="/login"
-            className="bg-blue-500 text-white px-3 py-1.5 rounded hover:bg-blue-600 text-sm sm:text-base"
-          >
-            ログイン
-          </Link>
+          {/* 未ログイン時のみ表示 */}
+          {!userName && (
+            <Link
+              to="/login"
+              className="bg-blue-500 text-white px-3 py-1.5 rounded hover:bg-blue-600 text-sm sm:text-base"
+            >
+              ログイン
+            </Link>
+          )}
 
-          <button
-            onClick={handleLogout}
-            className="bg-blue-500 text-white px-3 py-1.5 rounded hover:bg-blue-600 text-sm sm:text-base"
-          >
-            ログアウト
-          </button>
+          {/* ログイン時のみ表示 */}
+          {userName && (
+            <button
+              onClick={handleLogout}
+              className="bg-blue-500 text-white px-3 py-1.5 rounded hover:bg-blue-600 text-sm sm:text-base"
+            >
+              ログアウト
+            </button>
+          )}
 
-          <Link
-            to="/add"
-            className="bg-indigo-500 text-white px-3 py-1.5 rounded hover:bg-indigo-600 text-sm sm:text-base"
-          >
-            ➕ 商品を追加
-          </Link>
+          {/* 管理者 or ログイン中のみ表示（ログインしてないのに add できるのは不自然） */}
+          {userName && (
+            <Link
+              to="/add"
+              className="bg-indigo-500 text-white px-3 py-1.5 rounded hover:bg-indigo-600 text-sm sm:text-base"
+            >
+              ➕ 商品を追加
+            </Link>
+          )}
         </nav>
       </div>
 
@@ -131,20 +145,25 @@ const Header = ({ handleLogout, userName, userRole }) => {
             {userName ? `ようこそ、${userName}さん！` : "ようこそ！"}
           </span>
 
-          <Link
-            to="/profile"
-            className="w-full text-left bg-yellow-500 text-white px-3 py-1.5 rounded hover:bg-yellow-600 text-sm"
-          >
-            👤 プロフィール
-          </Link>
+          {/* ログイン中のみ表示 */}
+          {userName && (
+            <>
+              <Link
+                to="/profile"
+                className="w-full text-left bg-yellow-500 text-white px-3 py-1.5 rounded hover:bg-yellow-600 text-sm"
+              >
+                👤 プロフィール
+              </Link>
 
-          {userRole === "admin" && (
-            <Link
-              to="/admin"
-              className="w-full text-left bg-red-600 text-white px-3 py-1.5 rounded hover:bg-red-700 text-sm"
-            >
-              ⚙️ 管理者ページ
-            </Link>
+              {userRole === "admin" && (
+                <Link
+                  to="/admin"
+                  className="w-full text-left bg-red-600 text-white px-3 py-1.5 rounded hover:bg-red-700 text-sm"
+                >
+                  ⚙️ 管理者ページ
+                </Link>
+              )}
+            </>
           )}
 
           <Link
@@ -166,26 +185,34 @@ const Header = ({ handleLogout, userName, userRole }) => {
             )}
           </Link>
 
-          <Link
-            to="/login"
-            className="w-full text-left bg-blue-500 text-white px-3 py-1.5 rounded hover:bg-blue-600 text-sm"
-          >
-            ログイン
-          </Link>
+          {/* 未ログインのみ表示 */}
+          {!userName && (
+            <Link
+              to="/login"
+              className="w-full text-left bg-blue-500 text-white px-3 py-1.5 rounded hover:bg-blue-600 text-sm"
+            >
+              ログイン
+            </Link>
+          )}
 
-          <button
-            onClick={handleLogout}
-            className="w-full text-left bg-blue-500 text-white px-3 py-1.5 rounded hover:bg-blue-600 text-sm"
-          >
-            ログアウト
-          </button>
+          {/* ログイン中のみ表示 */}
+          {userName && (
+            <button
+              onClick={handleLogout}
+              className="w-full text-left bg-blue-500 text-white px-3 py-1.5 rounded hover:bg-blue-600 text-sm"
+            >
+              ログアウト
+            </button>
+          )}
 
-          <Link
-            to="/add"
-            className="w-full text-left bg-indigo-500 text-white px-3 py-1.5 rounded hover:bg-indigo-600 text-sm"
-          >
-            ➕ 商品を追加
-          </Link>
+          {userName && (
+            <Link
+              to="/add"
+              className="w-full text-left bg-indigo-500 text-white px-3 py-1.5 rounded hover:bg-indigo-600 text-sm"
+            >
+              ➕ 商品を追加
+            </Link>
+          )}
         </div>
       )}
     </header>

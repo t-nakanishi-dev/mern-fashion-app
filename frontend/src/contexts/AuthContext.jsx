@@ -108,7 +108,7 @@ export const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider value={value}>
       {/* Show a loading indicator while authentication is initializing */}
-      {!loading ? children : <div>Loading...</div>}
+      {!loading && children}
     </AuthContext.Provider>
   );
 };

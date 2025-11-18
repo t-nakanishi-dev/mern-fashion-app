@@ -128,120 +128,111 @@ function App() {
   const displayName = userName || "ゲスト";
   const userRole = mongoUser?.role || "guest";
 
-  // 🧱 Define app-wide routing and layout
   return (
     <LoadingProvider>
-      <Layout
-        userName={displayName} // 👤 Name shown in navigation
-        userRole={userRole} // 🛡️ Role: admin, user, etc.
-        handleLogout={handleLogout} // 🔓 Pass logout function to Layout
-      >
-        <Routes>
-          {/* 🏠 Home (product list) */}
-          <Route path="/" element={<ProductList />} />
+      <Routes>
+        {/* 🔐 Auth pages — NO HEADER */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
 
-          {/* ➕ Add product (requires authentication) */}
-          <Route
-            path="/add"
-            element={
-              <PrivateRoute>
-                <AddProduct />
-              </PrivateRoute>
-            }
-          />
+        {/* 🧱 Main app pages — WITH HEADER */}
+        <Route
+          path="/*"
+          element={
+            <Layout
+              userName={displayName}
+              userRole={userRole}
+              handleLogout={handleLogout}
+            >
+              <Routes>
+                <Route path="/" element={<ProductList />} />
+                <Route
+                  path="/add"
+                  element={
+                    <PrivateRoute>
+                      <AddProduct />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/profile"
+                  element={
+                    <PrivateRoute>
+                      <Profile />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/cart"
+                  element={
+                    <PrivateRoute>
+                      <Cart />
+                    </PrivateRoute>
+                  }
+                />
 
-          {/* 🧑‍💼 Profile page (requires authentication) */}
-          <Route
-            path="/profile"
-            element={
-              <PrivateRoute>
-                <Profile />
-              </PrivateRoute>
-            }
-          />
+                <Route
+                  path="/confirm"
+                  element={
+                    <PrivateRoute>
+                      <ConfirmOrder />
+                    </PrivateRoute>
+                  }
+                />
 
-          {/* 🛒 Cart page (requires authentication) */}
-          <Route
-            path="/cart"
-            element={
-              <PrivateRoute>
-                <Cart />
-              </PrivateRoute>
-            }
-          />
+                <Route
+                  path="/complete"
+                  element={
+                    <PrivateRoute>
+                      <OrderComplete />
+                    </PrivateRoute>
+                  }
+                />
 
-          {/* ✅ Order confirmation (requires authentication) */}
-          <Route
-            path="/confirm"
-            element={
-              <PrivateRoute>
-                <ConfirmOrder />
-              </PrivateRoute>
-            }
-          />
+                <Route
+                  path="/my-orders"
+                  element={
+                    <PrivateRoute>
+                      <MyOrders />
+                    </PrivateRoute>
+                  }
+                />
 
-          {/* 🎉 Order completion (requires authentication) */}
-          <Route
-            path="/complete"
-            element={
-              <PrivateRoute>
-                <OrderComplete />
-              </PrivateRoute>
-            }
-          />
+                <Route
+                  path="/admin"
+                  element={
+                    <PrivateRoute>
+                      <AdminDashboard />
+                    </PrivateRoute>
+                  }
+                />
 
-          {/* 🧾 My orders list (requires authentication) */}
-          <Route
-            path="/my-orders"
-            element={
-              <PrivateRoute>
-                <MyOrders />
-              </PrivateRoute>
-            }
-          />
+                <Route
+                  path="/admin/products"
+                  element={
+                    <PrivateRoute>
+                      <AdminProductList />
+                    </PrivateRoute>
+                  }
+                />
 
-          {/* 🛠️ Admin dashboard (requires authentication) */}
-          <Route
-            path="/admin"
-            element={
-              <PrivateRoute>
-                <AdminDashboard />
-              </PrivateRoute>
-            }
-          />
+                <Route
+                  path="/edit/:id"
+                  element={
+                    <PrivateRoute>
+                      <EditProduct />
+                    </PrivateRoute>
+                  }
+                />
 
-          <Route
-            path="/admin/products"
-            element={
-              <PrivateRoute>
-                <AdminProductList />
-              </PrivateRoute>
-            }
-          />
+                <Route path="/favorites" element={<Favorites />} />
+                <Route path="/products/:id" element={<ProductDetail />} />
+              </Routes>
+            </Layout>
+          }
+        />
+      </Routes>
 
-          {/* 📝 Edit product (requires authentication) */}
-          <Route
-            path="/edit/:id"
-            element={
-              <PrivateRoute>
-                <EditProduct />
-              </PrivateRoute>
-            }
-          />
-
-          {/* ❤️ Favorites page (no authentication required) */}
-          <Route path="/favorites" element={<Favorites />} />
-
-          {/* 🆕 Sign-up page (no authentication required) */}
-          <Route path="/signup" element={<SignUp />} />
-
-          {/* 🔐 Login page (no authentication required) */}
-          <Route path="/login" element={<Login />} />
-
-          {/* 🔍 Product details (no authentication required) */}
-          <Route path="/products/:id" element={<ProductDetail />} />
-        </Routes>
-      </Layout>
       <ToastContainer />
     </LoadingProvider>
   );
