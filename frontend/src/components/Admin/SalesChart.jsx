@@ -15,6 +15,16 @@ const SalesChart = ({ token }) => {
   const [monthlySales, setMonthlySales] = useState([]);
   const [error, setError] = useState(null);
 
+  // ダークモード対応（AdminDashboardと統一）
+  const [isDark, setIsDark] = useState(false);
+  useEffect(() => {
+    const update = () => setIsDark(document.documentElement.classList.contains("dark"));
+    update();
+    const observer = new MutationObserver(update);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+
   useEffect(() => {
     const fetchMonthlySales = async () => {
       try {
@@ -24,8 +34,6 @@ const SalesChart = ({ token }) => {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        console.log("月別売上データ:", res.data); // ← ここで確認
-        // データ整形
         const processedData = res.data.map((item) => ({
           month: `${item._id.year}-${String(item._id.month).padStart(2, "0")}`,
           totalSales: item.totalSales,
@@ -40,27 +48,68 @@ const SalesChart = ({ token }) => {
     if (token) fetchMonthlySales();
   }, [token]);
 
-  if (error) return <p className="text-red-600">{error}</p>;
+  if (error) {
+    return <div className="text-center py-8 text-red-500">{error}</div>;
+  }
+
+  if (monthlySales.length === 0) {
+    return (
+      <div className="text-center py-16 text-gray-500">
+        売上データがまだありません
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-white dark:bg-gray-800 p-4 rounded shadow mb-10">
-      <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">
+    <div className={`rounded-2xl border ${isDark ? "bg-white/5 border-white/10" : "bg-white/80 border-gray-200"} backdrop-blur-md p-6`}>
+      <h3 className="text-xl font-bold mb-6 text-purple-400">
         月別売上推移
-      </h2>
-      <ResponsiveContainer width="100%" height={300}>
-        <BarChart
-          data={monthlySales}
-          margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-          barCategoryGap="30%"
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="month" /> {/* ← これが月ラベル */}
-          <YAxis tickFormatter={(value) => `¥${value.toLocaleString()}`} />{" "}
-          {/* ← 金額表示 */}
-          <Tooltip formatter={(value) => `¥${value.toLocaleString()}`} />
-          <Bar dataKey="totalSales" fill="#8884d8" barSize={15} />
+      </h3>
+
+      <ResponsiveContainer width="100%" height={320}>
+        <BarChart data={monthlySales} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+          <CartesianGrid strokeDasharray="4 4" stroke={isDark ? "#374151" : "#e5e7eb"} />
+          
+          <XAxis 
+            dataKey="month" 
+            tick={{ fill: isDark ? "#d1d5db" : "#4b5563" }}
+            style={{ fontSize: "14px" }}
+          />
+          
+          <YAxis 
+            tickFormatter={(value) => `¥${(value / 1000).toFixed(0)}k`}
+            tick={{ fill: isDark ? "#9ca3af" : "#6b7280" }}
+            style={{ fontSize: "14px" }}
+          />
+          
+          <Tooltip
+            contentStyle={{
+              backgroundColor: isDark ? "rgba(31, 41, 55, 0.95)" : "rgba(255, 255, 255, 0.95)",
+              border: `1px solid ${isDark ? "#4b5563" : "#e5e7eb"}`,
+              borderRadius: "12px",
+              fontSize: "14px",
+            }}
+            formatter={(value) => `¥${value.toLocaleString()}`}
+          />
+          
+          <Bar 
+            dataKey="totalSales" 
+            fill={isDark ? "#c084fc" : "#a78bfa"}
+            radius={[8, 8, 0, 0]}
+            barSize={28}
+          />
         </BarChart>
       </ResponsiveContainer>
+
+      {/* 総売上を小さく表示（邪魔にならない程度に） */}
+      <div className={`mt-4 pt-4 border-t ${isDark ? "border-white/10" : "border-gray-200"} text-right`}>
+        <span className={`text-sm ${isDark ? "text-gray-400" : "text-gray-600"}`}>
+          期間合計：
+        </span>
+        <span className="ml-2 text-lg font-bold text-purple-400">
+          ¥{monthlySales.reduce((acc, cur) => acc + cur.totalSales, 0).toLocaleString()}
+        </span>
+      </div>
     </div>
   );
 };

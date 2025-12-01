@@ -1,221 +1,283 @@
 // src/components/Header.jsx
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { useCart } from "../contexts/CartContext";
+import {
+  Sun,
+  Moon,
+  ShoppingCart,
+  Heart,
+  User,
+  LogOut,
+  Menu,
+  X,
+  Package,
+  Shield,
+  Plus,
+} from "lucide-react";
 
-const Header = ({ handleLogout, userName, userRole }) => {
+const Header = ({ handleLogout, userName, userRole, isDark, setIsDark }) => {
   const { cartItems } = useCart();
   const itemCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
-
-  // ダークモードの状態管理
-  const [isDark, setIsDark] = useState(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("dark-mode");
-      if (saved !== null) return saved === "true";
-      return window.matchMedia("(prefers-color-scheme: dark)").matches;
-    }
-    return false;
-  });
-
-  useEffect(() => {
-    const root = window.document.documentElement;
-    if (isDark) {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
-    localStorage.setItem("dark-mode", isDark);
-  }, [isDark]);
-
-  const toggleDarkMode = () => setIsDark((prev) => !prev);
-
-  // ハンバーガーメニューの開閉状態
+  const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  return (
-    <header className="bg-gray-100 dark:bg-gray-800 p-4">
-      <div className="flex justify-between items-center">
-        <h1 className="text-xl font-bold dark:text-white">商品一覧</h1>
-
-        {/* ハンバーガーメニュー（モバイル） */}
-        <button
-          className="sm:hidden text-gray-800 dark:text-white text-2xl"
-          onClick={() => setMenuOpen((prev) => !prev)}
-        >
-          ☰
-        </button>
-
-        {/* 通常ナビゲーション（デスクトップ） */}
-        <nav className="hidden sm:flex flex-wrap gap-3 items-center">
-          <button
-            onClick={toggleDarkMode}
-            className="px-3 py-1.5 rounded bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-400 dark:hover:bg-gray-600 transition text-sm sm:text-base"
-            aria-label="ダークモード切替"
-          >
-            {isDark ? "🌙" : "☀️"}
-          </button>
-
-          <span className="text-sm sm:text-base dark:text-gray-200">
-            {userName ? `ようこそ、${userName}さん！` : "ようこそ！"}
-          </span>
-
-          {/* ログイン中のみ表示 */}
-          {userName && (
-            <>
-              <Link
-                to="/profile"
-                className="bg-yellow-500 text-white px-3 py-1.5 rounded hover:bg-yellow-600 text-sm sm:text-base"
-              >
-                👤 プロフィール
-              </Link>
-
-              {userRole === "admin" && (
-                <Link
-                  to="/admin"
-                  className="bg-red-600 text-white px-3 py-1.5 rounded hover:bg-red-700 text-sm sm:text-base"
-                >
-                  ⚙️ 管理者ページ
-                </Link>
-              )}
-            </>
-          )}
-
-          <Link
-            to="/favorites"
-            className="bg-pink-500 text-white px-3 py-1.5 rounded hover:bg-pink-600 text-sm sm:text-base"
-          >
-            ❤️ お気に入り一覧
-          </Link>
-
-          <Link
-            to="/cart"
-            className="bg-green-500 text-white px-3 py-1.5 rounded hover:bg-green-600 relative text-sm sm:text-base"
-          >
-            🛒 カート
-            {itemCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs px-1.5 py-0.5 rounded-full">
-                {itemCount}
-              </span>
-            )}
-          </Link>
-
-          {/* 未ログイン時のみ表示 */}
-          {!userName && (
-            <Link
-              to="/login"
-              className="bg-blue-500 text-white px-3 py-1.5 rounded hover:bg-blue-600 text-sm sm:text-base"
-            >
-              ログイン
-            </Link>
-          )}
-
-          {/* ログイン時のみ表示 */}
-          {userName && (
-            <button
-              onClick={handleLogout}
-              className="bg-blue-500 text-white px-3 py-1.5 rounded hover:bg-blue-600 text-sm sm:text-base"
-            >
-              ログアウト
-            </button>
-          )}
-
-          {/* 管理者 or ログイン中のみ表示（ログインしてないのに add できるのは不自然） */}
-          {userName && (
-            <Link
-              to="/add"
-              className="bg-indigo-500 text-white px-3 py-1.5 rounded hover:bg-indigo-600 text-sm sm:text-base"
-            >
-              ➕ 商品を追加
-            </Link>
-          )}
-        </nav>
-      </div>
-
-      {/* モバイルメニュー（ハンバーガー） */}
-      {menuOpen && (
-        <div className="sm:hidden mt-4 flex flex-col gap-3 items-start">
-          <button
-            onClick={toggleDarkMode}
-            className="w-full text-left px-3 py-1.5 rounded bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-400 dark:hover:bg-gray-600 transition text-sm"
-          >
-            {isDark ? "🌙 ダークモード" : "☀️ ライトモード"}
-          </button>
-
-          <span className="text-sm dark:text-gray-200">
-            {userName ? `ようこそ、${userName}さん！` : "ようこそ！"}
-          </span>
-
-          {/* ログイン中のみ表示 */}
-          {userName && (
-            <>
-              <Link
-                to="/profile"
-                className="w-full text-left bg-yellow-500 text-white px-3 py-1.5 rounded hover:bg-yellow-600 text-sm"
-              >
-                👤 プロフィール
-              </Link>
-
-              {userRole === "admin" && (
-                <Link
-                  to="/admin"
-                  className="w-full text-left bg-red-600 text-white px-3 py-1.5 rounded hover:bg-red-700 text-sm"
-                >
-                  ⚙️ 管理者ページ
-                </Link>
-              )}
-            </>
-          )}
-
-          <Link
-            to="/favorites"
-            className="w-full text-left bg-pink-500 text-white px-3 py-1.5 rounded hover:bg-pink-600 text-sm"
-          >
-            ❤️ お気に入り一覧
-          </Link>
-
-          <Link
-            to="/cart"
-            className="w-full text-left bg-green-500 text-white px-3 py-1.5 rounded hover:bg-green-600 text-sm relative"
-          >
-            🛒 カート
-            {itemCount > 0 && (
-              <span className="absolute top-1 right-3 bg-red-600 text-white text-xs px-1.5 py-0.5 rounded-full">
-                {itemCount}
-              </span>
-            )}
-          </Link>
-
-          {/* 未ログインのみ表示 */}
-          {!userName && (
-            <Link
-              to="/login"
-              className="w-full text-left bg-blue-500 text-white px-3 py-1.5 rounded hover:bg-blue-600 text-sm"
-            >
-              ログイン
-            </Link>
-          )}
-
-          {/* ログイン中のみ表示 */}
-          {userName && (
-            <button
-              onClick={handleLogout}
-              className="w-full text-left bg-blue-500 text-white px-3 py-1.5 rounded hover:bg-blue-600 text-sm"
-            >
-              ログアウト
-            </button>
-          )}
-
-          {userName && (
-            <Link
-              to="/add"
-              className="w-full text-left bg-indigo-500 text-white px-3 py-1.5 rounded hover:bg-indigo-600 text-sm"
-            >
-              ➕ 商品を追加
-            </Link>
+  const NavLink = ({ to, icon, label, badge, admin }) => {
+    const active = location.pathname === to;
+    return (
+      <Link
+        to={to}
+        className={`flex items-center gap-3 px-5 py-3 rounded-2xl font-medium transition-all duration-300 ${
+          active
+            ? "bg-purple-500/20 text-purple-300 shadow-lg shadow-purple-500/30"
+            : "text-gray-300 hover:bg-white/10 hover:text-white"
+        }`}
+      >
+        <div className="relative">
+          {icon}
+          {badge > 0 && (
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full min-w-[20px] text-center font-bold">
+              {badge}
+            </span>
           )}
         </div>
-      )}
-    </header>
+        <span>{label}</span>
+        {admin && (
+          <span className="ml-2 px-2 py-1 text-xs bg-red-500/30 text-red-300 rounded-full">
+            Admin
+          </span>
+        )}
+      </Link>
+    );
+  };
+
+  const MobileNavLink = ({ to, icon, label, badge, onClick }) => (
+    <Link
+      to={to}
+      onClick={onClick}
+      className="flex items-center justify-between w-full p-5 rounded-2xl bg-white/5 hover:bg-white/10 transition"
+    >
+      <div className="flex items-center gap-4">
+        <div className="relative">
+          {icon}
+          {badge > 0 && (
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">
+              {badge}
+            </span>
+          )}
+        </div>
+        <span className="text-lg">{label}</span>
+      </div>
+      <span className="text-gray-500">→</span>
+    </Link>
+  );
+
+  return (
+    <>
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-purple-500/20 backdrop-blur-2xl bg-gray-950/90 dark:bg-black/80 shadow-2xl">
+        <div className="max-w-7xl mx-auto px-5 lg:px-8">
+          <div className="flex items-center justify-between h-20">
+            {/* ロゴ PC */}
+            <Link
+              to="/"
+              className="flex items-center gap-4 group hidden sm:flex"
+            >
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 via-pink-500 to-red-500 rounded-2xl flex items-center justify-center shadow-xl shadow-purple-500/50 group-hover:scale-110 transition-all duration-300">
+                <Package className="w-7 h-7 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                  TechShop
+                </h1>
+                <p className="text-xs text-purple-300 -mt-1">Portfolio 2025</p>
+              </div>
+            </Link>
+            {/* ロゴ モバイル */}
+            <Link to="/" className="sm:hidden flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl shadow-lg">
+                <Package className="w-6 h-6 text-white m-2" />
+              </div>
+              <span className="text-xl font-bold text-white">TechShop</span>
+            </Link>
+
+            {/* デスクトップナビ */}
+            <nav className="hidden lg:flex items-center gap-2">
+              {/* ここは完璧！（PC版は正しい） */}
+              <button
+                onClick={() => setIsDark(!isDark)}
+                className="p-3 rounded-xl bg-white/10 hover:bg-white/20 transition-all hover:scale-110"
+              >
+                {isDark ? (
+                  <Sun className="w-5 h-5 text-yellow-400" />
+                ) : (
+                  <Moon className="w-5 h-5 text-purple-300" />
+                )}
+              </button>
+              <NavLink
+                to="/favorites"
+                icon={<Heart className="w-5 h-5" />}
+                label="お気に入り"
+              />
+              <NavLink
+                to="/cart"
+                icon={<ShoppingCart className="w-5 h-5" />}
+                label="カート"
+                badge={itemCount}
+              />
+              {userName && (
+                <NavLink
+                  to="/profile"
+                  icon={<User className="w-5 h-5" />}
+                  label="プロフィール"
+                />
+              )}
+              {userName && (
+                <NavLink
+                  to="/add"
+                  icon={<Plus className="w-5 h-5" />}
+                  label="商品追加"
+                />
+              )}
+              {userRole === "admin" && (
+                <NavLink
+                  to="/admin"
+                  icon={<Shield className="w-5 h-5" />}
+                  label="管理画面"
+                  admin
+                />
+              )}
+            </nav>
+
+            {/* 右側 */}
+            <div className="flex items-center gap-4">
+              <div className="hidden md:block text-right">
+                <p className="text-xs text-gray-400">Welcome back</p>
+                <p className="font-bold text-purple-300">
+                  {userName || "ゲスト"}
+                </p>
+              </div>
+              {userName && (
+                <button
+                  onClick={handleLogout}
+                  className="p-3 rounded-xl bg-red-500/20 hover:bg-red-500/40 text-red-400 transition-all hover:scale-110 group"
+                >
+                  <LogOut className="w-5 h-5 group-hover:rotate-12 transition" />
+                </button>
+              )}
+              <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="lg:hidden p-3 rounded-xl hover:bg-white/10 transition"
+              >
+                {menuOpen ? (
+                  <X className="w-6 h-6" />
+                ) : (
+                  <Menu className="w-6 h-6" />
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* モバイルメニュー */}
+        {menuOpen && (
+          <div className="lg:hidden border-t border-purple-500/30 bg-gray-950/95 backdrop-blur-2xl">
+            <div className="px-6 py-8 space-y-5">
+              {/* ユーザー情報 */}
+              <div className="flex items-center gap-4 pb-6 border-b border-purple-500/20">
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center ring-4 ring-purple-500/30">
+                  <User className="w-9 h-9 text-white" />
+                </div>
+                <div>
+                  <p className="text-xl font-bold text-purple-300">
+                    {userName || "ゲスト"}
+                  </p>
+                  <p className="text-sm text-gray-400">
+                    {userRole === "admin" ? "管理者" : "ユーザー"}
+                  </p>
+                </div>
+              </div>
+
+              {/* ここだけ修正！モバイルのダークモードボタン */}
+              <button
+                onClick={() => setIsDark(!isDark)}
+                className="w-full flex items-center justify-between p-4 rounded-2xl bg-white/5 hover:bg-white/10 transition"
+              >
+                <span className="flex items-center gap-3">
+                  {/* ここをPC版と同じに統一！ */}
+                  {isDark ? (
+                    <Sun className="w-5 h-5 text-yellow-400" />
+                  ) : (
+                    <Moon className="w-5 h-5 text-purple-300" />
+                  )}
+                  <span className="text-lg">
+                    {isDark
+                      ? "ライトモードに切り替え"
+                      : "ダークモードに切り替え"}
+                  </span>
+                </span>
+                {/* オプション：現在のモードをわかりやすく */}
+                <span className="text-xs text-purple-400 font-medium">
+                  {isDark ? "ダーク" : "ライト"}
+                </span>
+              </button>
+
+              <MobileNavLink
+                to="/favorites"
+                icon={<Heart className="w-6 h-6" />}
+                label="お気に入り一覧"
+                onClick={() => setMenuOpen(false)}
+              />
+              <MobileNavLink
+                to="/cart"
+                icon={<ShoppingCart className="w-6 h-6" />}
+                label="カート"
+                badge={itemCount}
+                onClick={() => setMenuOpen(false)}
+              />
+              {userName && (
+                <MobileNavLink
+                  to="/profile"
+                  icon={<User className="w-6 h-6" />}
+                  label="プロフィール"
+                  onClick={() => setMenuOpen(false)}
+                />
+              )}
+              {userName && (
+                <MobileNavLink
+                  to="/add"
+                  icon={<Plus className="w-6 h-6" />}
+                  label="商品を追加"
+                  onClick={() => setMenuOpen(false)}
+                />
+              )}
+              {userRole === "admin" && (
+                <MobileNavLink
+                  to="/admin"
+                  icon={<Shield className="w-6 h-6" />}
+                  label="管理者ページ"
+                  admin
+                  onClick={() => setMenuOpen(false)}
+                />
+              )}
+              {/* ログアウトボタン */}
+              {userName && (
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setMenuOpen(false);
+                  }}
+                  className="w-full flex items-center gap-4 p-5 bg-red-500/20 hover:bg-red-500/40 rounded-2xl text-red-300 transition"
+                >
+                  <LogOut className="w-6 h-6" />
+                  <span className="font-medium text-lg">ログアウト</span>
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+      </header>
+      <div className="h-20" />
+    </>
   );
 };
 

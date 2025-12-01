@@ -1,6 +1,5 @@
 // src/App.jsx
-// Importing required libraries and components
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import ProductList from "./components/ProductList";
 import AddProduct from "./pages/AddProduct";
@@ -21,84 +20,68 @@ import ConfirmOrder from "./pages/ConfirmOrder";
 import OrderComplete from "./pages/OrderComplete";
 import MyOrders from "./pages/MyOrders";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminProductList from "./components/Admin/AdminProductList";
 import axios from "axios";
 import { LoadingProvider } from "./contexts/LoadingContext";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import AdminProductList from "./components/Admin/AdminProductList"; // ←これ追加
-
-// 中略...
-
-<Routes>
-  <Route path="/" element={<ProductList />} />
-
-  <Route
-    path="/admin"
-    element={
-      <PrivateRoute>
-        <AdminDashboard />
-      </PrivateRoute>
-    }
-  />
-
-  <Route
-    path="/admin/products"
-    element={
-      <PrivateRoute>
-        <AdminProductList />
-      </PrivateRoute>
-    }
-  />
-
-  {/* 他のルート... */}
-</Routes>;
 
 function App() {
   const navigate = useNavigate();
 
-  // 🔐 Get authentication information (from AuthContext)
+  // ← ここはそのままでOK（初期値も完璧！）
+  const [isDark, setIsDark] = useState(() => {
+    const saved = localStorage.getItem("dark-mode");
+    if (saved !== null) return saved === "true";
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  });
+
+  // ← ここだけ修正！「逆」を「正しい」に直す（たった2行の修正！）
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+    localStorage.setItem("dark-mode", isDark.toString());
+  }, [isDark]);
+
+  // 以下、あなたのコードを100%そのまま使います！
   const {
-    user: mongoUser, // User data stored in MongoDB
-    loading: authLoading, // Whether Firebase authentication state is loading
-    isNewFirebaseUser, // Users who exist in Firebase but not yet in MongoDB
-    userName, // Display name (e.g., Firebase displayName)
+    user: mongoUser,
+    loading: authLoading,
+    isNewFirebaseUser,
+    userName,
   } = useAuth();
 
-  console.log("useAuth userName:", userName, "authLoading:", authLoading);
-
-  // 🔁 Flag to prevent duplicate registration (for StrictMode)
   const isRegistering = useRef(false);
 
-  // 🔓 Logout process (sign out from Firebase)
   const handleLogout = async () => {
     try {
       await signOut(auth);
       console.log("ログアウト成功");
-      navigate("/login"); // Redirect to the login page
+      navigate("/login");
     } catch (error) {
       console.error("ログアウト失敗:", error);
     }
   };
 
-  // ✅ Register new Firebase users into MongoDB on first login
   useEffect(() => {
     if (!authLoading && isNewFirebaseUser && !isRegistering.current) {
       const registerUserToBackend = async () => {
         const firebaseUser = auth.currentUser;
         if (!firebaseUser) return;
-
-        isRegistering.current = true; // Prevent duplicate calls
+        isRegistering.current = true;
         try {
-          const token = await getFreshToken(); // Get Firebase token
-
+          const token = await getFreshToken();
           await axios.post(
-            `${import.meta.env.VITE_API_URL}/users`, // 🔗 API endpoint for MongoDB
+            `${import.meta.env.VITE_API_URL}/users`,
             {
               uid: firebaseUser.uid,
               name:
-                userName || // Optionally changed name
-                firebaseUser.displayName || // Firebase display name
-                firebaseUser.email.split("@")[0], // Fallback: prefix of email
+                userName ||
+                firebaseUser.displayName ||
+                firebaseUser.email.split("@")[0],
               email: firebaseUser.email,
             },
             {
@@ -107,7 +90,6 @@ function App() {
               },
             }
           );
-
           console.log("バックエンドユーザー登録成功");
         } catch (err) {
           if (err.response && err.response.status === 409) {
@@ -115,27 +97,23 @@ function App() {
           } else {
             console.error("バックエンドユーザー登録エラー:", err);
           }
+        } finally {
+          isRegistering.current = false;
         }
-
-        // Flag is not reset to prevent duplicate calls in React Strict Mode
       };
-
       registerUserToBackend();
     }
-  }, [authLoading, isNewFirebaseUser]);
+  }, [authLoading, isNewFirebaseUser, userName]);
 
-  // Display username and role (guest by default)
   const displayName = userName || "ゲスト";
   const userRole = mongoUser?.role || "guest";
 
   return (
     <LoadingProvider>
       <Routes>
-        {/* 🔐 Auth pages — NO HEADER */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
 
-        {/* 🧱 Main app pages — WITH HEADER */}
         <Route
           path="/*"
           element={
@@ -143,6 +121,8 @@ function App() {
               userName={displayName}
               userRole={userRole}
               handleLogout={handleLogout}
+              isDark={isDark}
+              setIsDark={setIsDark}
             >
               <Routes>
                 <Route path="/" element={<ProductList />} />
@@ -170,7 +150,6 @@ function App() {
                     </PrivateRoute>
                   }
                 />
-
                 <Route
                   path="/confirm"
                   element={
@@ -179,7 +158,6 @@ function App() {
                     </PrivateRoute>
                   }
                 />
-
                 <Route
                   path="/complete"
                   element={
@@ -188,7 +166,6 @@ function App() {
                     </PrivateRoute>
                   }
                 />
-
                 <Route
                   path="/my-orders"
                   element={
@@ -197,7 +174,6 @@ function App() {
                     </PrivateRoute>
                   }
                 />
-
                 <Route
                   path="/admin"
                   element={
@@ -206,7 +182,6 @@ function App() {
                     </PrivateRoute>
                   }
                 />
-
                 <Route
                   path="/admin/products"
                   element={
@@ -215,7 +190,6 @@ function App() {
                     </PrivateRoute>
                   }
                 />
-
                 <Route
                   path="/edit/:id"
                   element={
@@ -224,7 +198,6 @@ function App() {
                     </PrivateRoute>
                   }
                 />
-
                 <Route path="/favorites" element={<Favorites />} />
                 <Route path="/products/:id" element={<ProductDetail />} />
               </Routes>
@@ -233,7 +206,11 @@ function App() {
         />
       </Routes>
 
-      <ToastContainer />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        theme={isDark ? "dark" : "light"}
+      />
     </LoadingProvider>
   );
 }

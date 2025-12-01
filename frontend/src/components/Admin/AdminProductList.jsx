@@ -115,13 +115,15 @@ const AdminProductList = () => {
       {/* 商品リスト全体を囲むdivに overflow-x-auto を追加 */}
       <div className="overflow-x-auto">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {/* ここだけ変更！ isAdmin={true} を追加 */}
           {filteredProducts.map((product) => (
             <div key={product._id} className="relative">
-              <ProductCard product={product} />
-              <div className="absolute top-2 right-2 flex gap-2">
+              <ProductCard product={product} isAdmin={true} />{" "}
+              {/* ← これ追加！ */}
+              <div className="absolute top-2 right-2 flex gap-2 z-20">
                 <Link
                   to={`/edit/${product._id}`}
-                  className="bg-yellow-400 text-white px-2 py-1 rounded text-sm"
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-lg transition-all hover:scale-105"
                 >
                   編集
                 </Link>

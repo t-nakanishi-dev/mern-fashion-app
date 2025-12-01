@@ -3,6 +3,14 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 import { Link } from "react-router-dom";
+import {
+  User,
+  Package,
+  ShoppingBag,
+  Edit3,
+  Save,
+  CheckCircle,
+} from "lucide-react";
 
 const Profile = () => {
   const { user, token, setUserName } = useAuth();
@@ -10,17 +18,21 @@ const Profile = () => {
   const [originalName, setOriginalName] = useState("");
   const [message, setMessage] = useState("");
   const [nameError, setNameError] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
 
   const [myProducts, setMyProducts] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [productError, setProductError] = useState(null);
 
+  const [stockEdits, setStockEdits] = useState({});
+  const [updatingId, setUpdatingId] = useState(null);
+
+  const isDark = document.documentElement.classList.contains("dark");
+
   useEffect(() => {
     if (user) {
-      setName(user.name);
-      setOriginalName(user.name);
-      setNameError("");
-      setMessage("");
+      setName(user.name || "");
+      setOriginalName(user.name || "");
     }
   }, [user]);
 
@@ -31,12 +43,8 @@ const Profile = () => {
         setLoadingProducts(true);
         const res = await axios.get(
           `${import.meta.env.VITE_API_URL}/products/mine`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
-
-        console.log("APIレスポンス", res.data);
         setMyProducts(res.data);
         setProductError(null);
       } catch (err) {
@@ -51,7 +59,7 @@ const Profile = () => {
 
   const validateName = (input) => {
     if (!input.trim()) {
-      setNameError("名前は空にできません。");
+      setNameError("名前は空にできません");
       return false;
     }
     setNameError("");
@@ -59,35 +67,26 @@ const Profile = () => {
   };
 
   const handleUpdate = async () => {
-    if (!validateName(name)) {
-      setMessage("");
-      return;
-    }
+    if (!validateName(name)) return;
     if (name === originalName) {
-      setMessage("変更内容がありません。");
+      setMessage("変更内容がありません");
       return;
     }
 
     try {
-      const res = await axios.patch(
+      await axios.patch(
         `${import.meta.env.VITE_API_URL}/users/${user.uid}`,
         { name },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-      console.log("名前更新成功", res.data);
       setMessage("名前を更新しました！");
       setOriginalName(name);
       setUserName(name);
+      setIsEditing(false);
     } catch (error) {
-      console.error("名前の更新に失敗しました:", error);
-      setMessage("名前の更新に失敗しました。");
+      setMessage("名前の更新に失敗しました");
     }
   };
-
-  const [stockEdits, setStockEdits] = useState({});
-  const [updatingId, setUpdatingId] = useState(null);
 
   const handleSaveStock = async (productId) => {
     const newStock = Number(stockEdits[productId]);
@@ -103,14 +102,14 @@ const Profile = () => {
         { countInStock: newStock },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      alert("在庫を更新しました");
       setMyProducts((prev) =>
         prev.map((p) =>
           p._id === productId ? { ...p, countInStock: newStock } : p
         )
       );
+      setStockEdits((prev) => ({ ...prev, [productId]: "" }));
+      setMessage("在庫を更新しました");
     } catch (err) {
-      console.error(err);
       alert("在庫の更新に失敗しました");
     } finally {
       setUpdatingId(null);
@@ -118,135 +117,250 @@ const Profile = () => {
   };
 
   return (
-    <div className="max-w-xl mx-auto p-6 text-gray-800 dark:text-white dark:bg-gray-900 rounded">
-      <div className="mb-6">
-        <Link
-          to="/"
-          className="inline-block bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
-        >
-          ホームに戻る
-        </Link>
-      </div>
-
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          名前
-        </label>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => {
-            setName(e.target.value);
-            validateName(e.target.value);
-            setMessage("");
-          }}
-          className={`w-full border rounded px-3 py-2 ${
-            nameError
-              ? "border-red-500 dark:border-red-400"
-              : "border-gray-300 dark:border-gray-600"
-          } bg-white dark:bg-gray-800 text-gray-800 dark:text-white`}
-        />
-        {nameError && (
-          <p className="text-red-600 dark:text-red-400 text-sm mt-1">
-            {nameError}
+    <div className="min-h-screen pt-24 pb-16 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto">
+        {/* ヘッダーエリア */}
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center justify-center w-32 h-32 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 p-1 shadow-2xl shadow-purple-500/50 mb-8">
+            <div className="w-full h-full rounded-full bg-black/50 backdrop-blur-xl flex items-center justify-center">
+              <User className="w-20 h-20 text-white" />
+            </div>
+          </div>
+          <h1 className="text-6xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-4">
+            マイページ
+          </h1>
+          <p
+            className={`text-xl ${isDark ? "text-gray-400" : "text-gray-600"}`}
+          >
+            {user?.email}
           </p>
-        )}
-      </div>
+        </div>
 
-      <button
-        onClick={handleUpdate}
-        className="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 transition"
-      >
-        ✏️ 名前を更新
-      </button>
+        <div className="grid lg:grid-cols-3 gap-10">
+          {/* 左側：プロフィール編集 */}
+          <div className="lg:col-span-1">
+            <div
+              className={`rounded-3xl p-8 backdrop-blur-xl border ${
+                isDark
+                  ? "bg-white/5 border-white/10"
+                  : "bg-white/90 border-gray-200 shadow-2xl"
+              }`}
+            >
+              <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
+                <Edit3 className="w-8 h-8 text-purple-400" />
+                プロフィール
+              </h2>
 
-      {message && (
-        <p className="mt-4 text-sm font-medium text-gray-700 dark:text-gray-300">
-          {message}
-        </p>
-      )}
-
-      <div className="mt-6 mb-6">
-        <Link
-          to="/my-orders"
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 inline-block"
-        >
-          🧾 注文履歴を見る
-        </Link>
-      </div>
-
-      <section>
-        <h2 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">
-          自分の商品一覧
-        </h2>
-        {loadingProducts ? (
-          <p>読み込み中...</p>
-        ) : productError ? (
-          <p className="text-red-600 dark:text-red-400">{productError}</p>
-        ) : myProducts.length === 0 ? (
-          <p>登録した商品はありません。</p>
-        ) : (
-          <table className="w-full border-collapse border border-gray-300 dark:border-gray-600">
-            <thead>
-              <tr className="bg-gray-200 dark:bg-gray-700">
-                <th className="border border-gray-300 dark:border-gray-600 p-2">
-                  商品名
-                </th>
-                <th className="border border-gray-300 dark:border-gray-600 p-2">
-                  カテゴリ
-                </th>
-                <th className="border border-gray-300 dark:border-gray-600 p-2">
-                  価格
-                </th>
-                <th className="border border-gray-300 dark:border-gray-600 p-2">
-                  在庫数
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {myProducts.map((product) => (
-                <tr key={product._id} className="text-center">
-                  <td className="border border-gray-300 dark:border-gray-600 p-2">
-                    {product.name}
-                  </td>
-                  <td className="border border-gray-300 dark:border-gray-600 p-2">
-                    {product.category}
-                  </td>
-                  <td className="border border-gray-300 dark:border-gray-600 p-2">
-                    ¥{product.price.toLocaleString()}
-                  </td>
-                  {product.createdBy === user._id && (
-                    <td className="border border-gray-300 dark:border-gray-600 p-2 text-center">
-                      <div className="flex items-center justify-center">
-                        <input
-                          type="number"
-                          className="w-20 border rounded p-1 text-center bg-white dark:bg-gray-800 text-gray-800 dark:text-white border-gray-300 dark:border-gray-600"
-                          value={
-                            stockEdits[product._id] ?? product.countInStock
-                          }
-                          onChange={(e) =>
-                            setStockEdits({
-                              ...stockEdits,
-                              [product._id]: e.target.value,
-                            })
-                          }
-                        />
-                        <button
-                          onClick={() => handleSaveStock(product._id)}
-                          disabled={updatingId === product._id}
-                          className="ml-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-                        >
-                          保存
-                        </button>
-                      </div>
-                    </td>
+              <div className="space-y-6">
+                <div>
+                  <label
+                    className={`block text-sm font-medium mb-3 ${
+                      isDark ? "text-gray-300" : "text-gray-700"
+                    }`}
+                  >
+                    ユーザー名
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => {
+                        setName(e.target.value);
+                        validateName(e.target.value);
+                        setMessage("");
+                      }}
+                      disabled={!isEditing}
+                      className={`flex-1 px-5 py-4 rounded-2xl border transition-all ${
+                        isEditing
+                          ? "bg-white/10 border-purple-500/50 focus:border-purple-400 focus:ring-4 focus:ring-purple-500/20"
+                          : "bg-white/5 border-white/10"
+                      } ${isDark ? "text-white" : "text-gray-900"}`}
+                    />
+                    {isEditing ? (
+                      <button
+                        onClick={handleUpdate}
+                        className="p-4 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:scale-110 transition-all shadow-lg"
+                      >
+                        <Save className="w-6 h-6" />
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => setIsEditing(true)}
+                        className="p-4 rounded-full bg-white/10 hover:bg-white/20 transition-all"
+                      >
+                        <Edit3 className="w-6 h-6 text-purple-400" />
+                      </button>
+                    )}
+                  </div>
+                  {nameError && (
+                    <p className="text-red-400 text-sm mt-2">{nameError}</p>
                   )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </section>
+                </div>
+
+                {message && (
+                  <div
+                    className={`flex items-center gap-3 p-4 rounded-2xl ${
+                      message.includes("成功") || message.includes("更新")
+                        ? "bg-green-500/20 text-green-400"
+                        : "bg-red-500/20 text-red-400"
+                    }`}
+                  >
+                    <CheckCircle className="w-6 h-6" />
+                    <span>{message}</span>
+                  </div>
+                )}
+
+                <div className="pt-6 space-y-4">
+                  <Link
+                    to="/my-orders"
+                    className="w-full flex items-center justify-center gap-3 px-8 py-5 bg-gradient-to-r from-blue-600 to-cyan-600 text-white text-lg font-bold rounded-2xl hover:scale-105 transition-all shadow-lg"
+                  >
+                    <ShoppingBag className="w-6 h-6" />
+                    注文履歴を見る
+                  </Link>
+
+                  <Link
+                    to="/"
+                    className={`w-full block text-center py-4 rounded-2xl border ${
+                      isDark
+                        ? "border-purple-500/50 text-purple-300 hover:bg-white/5"
+                        : "border-purple-400 text-purple-600 hover:bg-purple-50"
+                    } transition-all`}
+                  >
+                    ホームに戻る
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 右側：自分の商品一覧 */}
+          <div className="lg:col-span-2">
+            <div
+              className={`rounded-3xl p-8 backdrop-blur-xl border ${
+                isDark
+                  ? "bg-white/5 border-white/10"
+                  : "bg-white/90 border-gray-200 shadow-2xl"
+              }`}
+            >
+              <h2 className="text-4xl font-black mb-8 flex items-center gap-4">
+                <Package className="w-10 h-10 text-purple-400" />
+                自分が登録した商品
+              </h2>
+
+              {loadingProducts ? (
+                <div className="text-center py-20">
+                  <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto" />
+                </div>
+              ) : productError ? (
+                <p className="text-red-400 text-center py-10">{productError}</p>
+              ) : myProducts.length === 0 ? (
+                <div className="text-center py-20">
+                  <Package className="w-24 h-24 mx-auto text-gray-500/30 mb-6" />
+                  <p
+                    className={`text-2xl ${
+                      isDark ? "text-gray-400" : "text-gray-600"
+                    }`}
+                  >
+                    まだ商品を登録していません
+                  </p>
+                  <Link
+                    to="/add"
+                    className="inline-block mt-8 px-10 py-5 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xl font-bold rounded-2xl hover:scale-110 transition-all shadow-2xl"
+                  >
+                    今すぐ商品を追加する
+                  </Link>
+                </div>
+              ) : (
+                <div className="grid gap-6">
+                  {myProducts.map((product) => (
+                    <div
+                      key={product._id}
+                      className={`p-6 rounded-3xl backdrop-blur-xl border transition-all hover:scale-[1.02] ${
+                        isDark
+                          ? "bg-white/5 border-white/10 hover:border-purple-500/50"
+                          : "bg-white/80 border-gray-200 hover:border-purple-400 shadow-lg"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-6">
+                        <div className="flex items-center gap-6 flex-1">
+                          <img
+                            src={product.imageUrl || "/placeholder.jpg"}
+                            alt={product.name}
+                            className="w-24 h-24 object-cover rounded-2xl shadow-xl"
+                          />
+                          <div>
+                            <h3
+                              className={`text-2xl font-bold ${
+                                isDark ? "text-white" : "text-gray-900"
+                              }`}
+                            >
+                              {product.name}
+                            </h3>
+                            <p className={`text-purple-400 font-medium`}>
+                              {product.category}
+                            </p>
+                            <p
+                              className={`text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mt-2`}
+                            >
+                              ¥{product.price.toLocaleString()}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                          <div className="text-right">
+                            <p
+                              className={`text-sm ${
+                                isDark ? "text-gray-400" : "text-gray-600"
+                              }`}
+                            >
+                              在庫数
+                            </p>
+                            <p
+                              className={`text-3xl font-black ${
+                                isDark ? "text-white" : "text-gray-900"
+                              }`}
+                            >
+                              {product.countInStock}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <input
+                              type="number"
+                              min="0"
+                              value={stockEdits[product._id] ?? ""}
+                              onChange={(e) =>
+                                setStockEdits({
+                                  ...stockEdits,
+                                  [product._id]: e.target.value,
+                                })
+                              }
+                              placeholder={product.countInStock}
+                              className={`w-24 px-4 py-3 rounded-2xl border text-center font-bold ${
+                                isDark
+                                  ? "bg-white/10 border-white/20 text-white placeholder-gray-500"
+                                  : "bg-white border-gray-300 text-gray-900"
+                              }`}
+                            />
+                            <button
+                              onClick={() => handleSaveStock(product._id)}
+                              disabled={updatingId === product._id}
+                              className="p-4 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:scale-110 transition-all shadow-lg disabled:opacity-50"
+                            >
+                              <Save className="w-6 h-6" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
