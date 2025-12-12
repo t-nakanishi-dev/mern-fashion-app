@@ -1,7 +1,8 @@
 # Node
 node_modules/
 .env
-.env.development.local
+.env.*
+
 
 # Vite/CRA build
 dist/
