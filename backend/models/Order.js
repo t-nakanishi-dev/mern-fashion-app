@@ -55,5 +55,8 @@ const orderSchema = new mongoose.Schema(
   }
 );
 
+orderSchema.index({ userUid: 1 });
+orderSchema.index({ status: 1 });
+
 // ✅ Export the model (preventing duplicate model registration)
 module.exports = mongoose.models.Order || mongoose.model("Order", orderSchema);

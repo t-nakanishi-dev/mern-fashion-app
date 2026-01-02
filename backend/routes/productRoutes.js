@@ -41,13 +41,19 @@ router.get("/mine", verifyFirebaseToken, async (req, res) => {
   }
 });
 
-// ✅ Public: Get ALL products (accessible to anyone)
+// ✅ Public: Get ALL products (accessible to anyone) ← ここを修正！
 router.get("/", async (req, res) => {
   try {
     console.log(
       "DEBUG: GET /api/products (すべての商品) ルートに到達しました。"
     );
-    const products = await Product.find({}); // すべての商品を取得
+    const products = await Product.find({})
+      .populate({
+        path: "createdBy",
+        select: "name", // nameだけ取得して負荷軽減
+      })
+      .sort({ createdAt: -1 }); // 最新順に並べると見栄え良し（任意）
+
     res.json(products);
   } catch (err) {
     console.error("Error fetching all products:", err);

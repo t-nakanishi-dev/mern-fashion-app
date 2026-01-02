@@ -15,6 +15,7 @@ Thumbs.db
 # Firebase Admin SDK サービスアカウント鍵ファイル
 backend/serviceAccountKey.json
 encoded.txt
+full_base64_key.txt
 
 MEMO.md
 面談練習.md
