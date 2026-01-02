@@ -39,7 +39,19 @@ createRoot(document.getElementById("root")).render(
             {/* 🧩 The main application component */}
             <App />
             {/* 💬 Displays toast notifications (success, error messages, etc.) */}
-            <ToastContainer />
+            <ToastContainer
+              position="top-center"
+              autoClose={4000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="colored" 
+              className="mt-20" // ヘッダーと被らないように少し下げる
+            />
           </AuthProvider>
         </CartProvider>
       </BrowserRouter>
