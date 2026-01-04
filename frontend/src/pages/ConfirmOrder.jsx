@@ -1,21 +1,23 @@
-// src/pages/ConfirmOrder.jsx
 import React from "react";
 import { useCart } from "../contexts/CartContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { loadStripe } from "@stripe/stripe-js";
 
+// 🔑 Stripe 公開キーを使って Stripe.js を初期化
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 const ConfirmOrder = () => {
   const { cartItems } = useCart();
   const navigate = useNavigate();
 
+  // 合計金額を計算
   const totalAmount = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
 
+  // 注文確定 → Stripe Checkout へ遷移
   const handleConfirm = async () => {
     if (cartItems.length === 0) {
       toast.warn("カートに商品がありません。");
@@ -23,7 +25,6 @@ const ConfirmOrder = () => {
     }
 
     try {
-      const stripe = await stripePromise;
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/payment/create-checkout-session`,
         {
@@ -34,12 +35,26 @@ const ConfirmOrder = () => {
       );
 
       if (!response.ok) {
-        throw new Error("決済セッションの作成に失敗しました。");
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.error || "決済セッションの作成に失敗しました。"
+        );
       }
 
-      const session = await response.json();
+      // Stripe Checkout Session ID を取得
+      const { id: sessionId } = await response.json();
 
-      const result = await stripe.redirectToCheckout({ sessionId: session.id });
+      const stripe = await stripePromise;
+
+      if (!stripe) {
+        throw new Error("Stripe の初期化に失敗しました。");
+      }
+
+      // 🔁 正式な Stripe Checkout リダイレクト
+      const result = await stripe.redirectToCheckout({
+        sessionId,
+      });
+
       if (result.error) {
         toast.error(result.error.message);
       }
@@ -49,6 +64,7 @@ const ConfirmOrder = () => {
     }
   };
 
+  // カートが空の場合
   if (cartItems.length === 0) {
     return <p className="p-6">カートに商品がありません。</p>;
   }
@@ -75,7 +91,7 @@ const ConfirmOrder = () => {
 
       <button
         onClick={handleConfirm}
-        className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+        className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition"
       >
         注文を確定する
       </button>

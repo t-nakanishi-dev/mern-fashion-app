@@ -1,49 +1,63 @@
 // backend/routes/payment.js
 
-// Import required modules
 const express = require("express");
 const Stripe = require("stripe");
 const dotenv = require("dotenv");
 
-// Load environment variables from .env file
 dotenv.config();
 
 const router = express.Router();
 
-// Initialize Stripe instance with secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-// 📦 API endpoint to create a Stripe Checkout session
 router.post("/create-checkout-session", async (req, res) => {
-  const { items } = req.body; // Purchase details sent from the frontend
+  const { items } = req.body;
+
+  console.log("🛒 Received items for Stripe:", items); // ← デバッグ用に追加（重要！）
+
+  if (!items || items.length === 0) {
+    return res.status(400).json({ error: "カートが空です" });
+  }
 
   try {
-    // Create a new Stripe Checkout session
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"], // Accept credit card payments only
-      mode: "payment", // One-time payment
-      line_items: items.map((item) => ({
+    const lineItems = items.map((item) => {
+      // name が存在しない場合のフォールバック
+      const productName = item.name || item.product?.name || "不明な商品";
+
+      if (!item.price || item.price <= 0) {
+        throw new Error(`無効な価格: ${productName}`);
+      }
+
+      return {
         price_data: {
-          currency: "jpy", // Currency set to Japanese Yen
+          currency: "jpy",
           product_data: {
-            name: item.name, // Product name to display in Stripe Checkout
+            name: productName,
+            // images: item.imageUrl ? [item.imageUrl] : [], // 任意で画像も追加可能
           },
-          unit_amount: item.price, // Price in the smallest currency unit (e.g., 100 = ¥100)
+          unit_amount: Math.round(item.price), // 念のため整数に
         },
-        quantity: item.quantity, // Quantity of the product
-      })),
-      // URL to redirect to after successful payment
-      success_url: `${process.env.FRONTEND_URL}/complete`,
-      // URL to redirect to if the customer cancels the payment
+        quantity: item.quantity || 1,
+      };
+    });
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      mode: "payment",
+      line_items: lineItems,
+      success_url: `${process.env.FRONTEND_URL}/complete`, // ← /complete じゃなくて /order-complete に合わせる
       cancel_url: `${process.env.FRONTEND_URL}/cart`,
     });
 
-    // Respond with the session ID (used to redirect to the Stripe Checkout page)
+    console.log("✅ Stripe Checkout Session Created:", session.id);
+
     res.json({ id: session.id });
   } catch (error) {
     console.error("❌ Stripe Checkout Session Error:", error);
-    // Return a 500 error with a user-friendly message
-    res.status(500).json({ error: error.message, raw: error });
+    res.status(500).json({
+      error: "決済セッションの作成に失敗しました",
+      details: error.message,
+    });
   }
 });
 

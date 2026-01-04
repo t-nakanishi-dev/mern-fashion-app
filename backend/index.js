@@ -1,7 +1,19 @@
 // index.js
 
-// ✅ Load environment variables from the .env file
-require("dotenv").config(); // Load .env configuration
+require("dotenv").config(); // まず .env（共通）を読み込む
+
+// 次に、環境に応じてオーバーライド用のファイルを読み込む
+const env = process.env.NODE_ENV || "development"; // デフォルトは development
+
+if (env === "production") {
+  require("dotenv").config({ path: ".env.production", override: true });
+} else {
+  require("dotenv").config({ path: ".env.development", override: true });
+}
+
+// デバッグ用ログ（本番では削除してもOK）
+console.log("🌍 Current NODE_ENV:", env);
+console.log("🔗 FRONTEND_URL:", process.env.FRONTEND_URL);
 
 // ✅ Import core modules
 const express = require("express");

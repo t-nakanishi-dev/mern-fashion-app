@@ -29,14 +29,14 @@ import "react-toastify/dist/ReactToastify.css";
 function App() {
   const navigate = useNavigate();
 
-  // ← ここはそのままでOK（初期値も完璧！）
+  // 🌙 ダークモード状態管理（初期値OK）
   const [isDark, setIsDark] = useState(() => {
     const saved = localStorage.getItem("dark-mode");
     if (saved !== null) return saved === "true";
     return window.matchMedia("(prefers-color-scheme: dark)").matches;
   });
 
-  // ← ここだけ修正！「逆」を「正しい」に直す（たった2行の修正！）
+  // 🌙 ダークモード反映（修正済み）
   useEffect(() => {
     if (isDark) {
       document.documentElement.classList.add("dark");
@@ -46,7 +46,7 @@ function App() {
     localStorage.setItem("dark-mode", isDark.toString());
   }, [isDark]);
 
-  // 以下、あなたのコードを100%そのまま使います！
+  // 🔐 認証情報
   const {
     user: mongoUser,
     loading: authLoading,
@@ -56,6 +56,7 @@ function App() {
 
   const isRegistering = useRef(false);
 
+  // 🚪 ログアウト
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -66,12 +67,15 @@ function App() {
     }
   };
 
+  // 🧑‍💻 Firebase新規ユーザー → バックエンド登録
   useEffect(() => {
     if (!authLoading && isNewFirebaseUser && !isRegistering.current) {
       const registerUserToBackend = async () => {
         const firebaseUser = auth.currentUser;
         if (!firebaseUser) return;
+
         isRegistering.current = true;
+
         try {
           const token = await getFreshToken();
           await axios.post(
@@ -92,7 +96,7 @@ function App() {
           );
           console.log("バックエンドユーザー登録成功");
         } catch (err) {
-          if (err.response && err.response.status === 409) {
+          if (err.response?.status === 409) {
             console.warn("ユーザーは既に登録されています");
           } else {
             console.error("バックエンドユーザー登録エラー:", err);
@@ -101,6 +105,7 @@ function App() {
           isRegistering.current = false;
         }
       };
+
       registerUserToBackend();
     }
   }, [authLoading, isNewFirebaseUser, userName]);
@@ -110,6 +115,7 @@ function App() {
 
   return (
     <LoadingProvider>
+      <ToastContainer />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
@@ -126,6 +132,7 @@ function App() {
             >
               <Routes>
                 <Route path="/" element={<ProductList />} />
+
                 <Route
                   path="/add"
                   element={
@@ -134,6 +141,7 @@ function App() {
                     </PrivateRoute>
                   }
                 />
+
                 <Route
                   path="/profile"
                   element={
@@ -142,6 +150,7 @@ function App() {
                     </PrivateRoute>
                   }
                 />
+
                 <Route
                   path="/cart"
                   element={
@@ -150,6 +159,7 @@ function App() {
                     </PrivateRoute>
                   }
                 />
+
                 <Route
                   path="/confirm"
                   element={
@@ -158,6 +168,7 @@ function App() {
                     </PrivateRoute>
                   }
                 />
+
                 <Route
                   path="/complete"
                   element={
@@ -166,6 +177,7 @@ function App() {
                     </PrivateRoute>
                   }
                 />
+
                 <Route
                   path="/my-orders"
                   element={
@@ -174,6 +186,7 @@ function App() {
                     </PrivateRoute>
                   }
                 />
+
                 <Route
                   path="/admin"
                   element={
@@ -182,6 +195,7 @@ function App() {
                     </PrivateRoute>
                   }
                 />
+
                 <Route
                   path="/admin/products"
                   element={
@@ -190,6 +204,7 @@ function App() {
                     </PrivateRoute>
                   }
                 />
+
                 <Route
                   path="/edit/:id"
                   element={
@@ -198,6 +213,7 @@ function App() {
                     </PrivateRoute>
                   }
                 />
+
                 <Route path="/favorites" element={<Favorites />} />
                 <Route path="/products/:id" element={<ProductDetail />} />
               </Routes>
