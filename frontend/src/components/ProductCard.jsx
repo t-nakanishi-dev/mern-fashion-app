@@ -1,17 +1,29 @@
 // src/components/ProductCard.jsx
 import React from "react";
-import { useFavorite } from "../contexts/FavoriteContext"; // ← これを追加！
+import { useFavorite } from "../contexts/FavoriteContext";
 import { useCart } from "../contexts/CartContext";
 import { Heart, ShoppingCart } from "lucide-react";
+import { showSuccess } from "../utils/showToast"; // ← これを追加
 
 const ProductCard = ({ product, onClick, isAdmin = false }) => {
-  const { toggleFavorite, isFavorite } = useFavorite(); // ← これでエラー解消！
+  const { toggleFavorite, isFavorite } = useFavorite();
   const { addToCart } = useCart();
   const favorite = isFavorite(product._id);
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
     addToCart(product);
+
+    // Toastでフィードバック
+    showSuccess(
+      <div className="flex items-center gap-3">
+        <ShoppingCart className="w-5 h-5" />
+        <div>
+          <p className="font-bold">{product.name}</p>
+          <p className="text-sm opacity-90">カートに追加しました！</p>
+        </div>
+      </div>
+    );
   };
 
   const handleFavorite = (e) => {

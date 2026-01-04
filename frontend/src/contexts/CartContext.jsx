@@ -1,86 +1,95 @@
-// src/contexts/CartContext.jsx (修正版)
+// src/contexts/CartContext.jsx
 import { createContext, useContext, useEffect, useState } from "react";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
-// Create a context for the cart
 const CartContext = createContext(null);
 
-// Custom hook for easy access to the cart context
 export const useCart = () => {
   const context = useContext(CartContext);
-  if (!context) {
-    throw new Error("useCart must be used within a CartProvider");
-  }
+  if (!context) throw new Error("useCart must be used within a CartProvider");
   return context;
 };
 
-// Component that wraps the entire app to provide cart state
 export const CartProvider = ({ children }) => {
-  // Initialize cart from localStorage; return empty array if parsing fails
-  const [cartItems, setCartItems] = useState(() => {
-    try {
-      const saved = localStorage.getItem("cart");
-      return saved ? JSON.parse(saved) : [];
-    } catch (error) {
-      console.error("Failed to parse cart from localStorage:", error);
-      return [];
-    }
-  });
+  const [cartItems, setCartItems] = useState([]);
+  const [currentUserUid, setCurrentUserUid] = useState(null);
 
-  // Calculate total price of all items in the cart
+  // Firebase Authの状態を監視
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      const uid = user ? user.uid : null;
+      setCurrentUserUid(uid);
+
+      // ユーザー変更時にローカルストレージから適切なカートを読み込む
+      if (uid) {
+        const saved = localStorage.getItem(`cart_${uid}`);
+        setCartItems(saved ? JSON.parse(saved) : []);
+      } else {
+        // ログアウト時はカートを空に（ゲスト用は作らない場合）
+        setCartItems([]);
+        localStorage.removeItem("cart_guest"); // 必要ならゲスト用も
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // カート変更時にユーザーごとのキーで保存
+  useEffect(() => {
+    if (currentUserUid) {
+      localStorage.setItem(`cart_${currentUserUid}`, JSON.stringify(cartItems));
+    }
+  }, [cartItems, currentUserUid]);
+
   const totalPrice = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
 
-  // Save cart to localStorage whenever it updates
-  useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cartItems));
-  }, [cartItems]);
-
-  // Add a product to the cart (or increase quantity if it already exists)
   const addToCart = (product) => {
+    if (!currentUserUid) {
+      alert("ログインしてください");
+      return;
+    }
     setCartItems((prev) => {
-      const existingItem = prev.find((item) => item._id === product._id);
-      if (existingItem) {
-        // If item exists, increase quantity by 1
+      const existing = prev.find((item) => item._id === product._id);
+      if (existing) {
         return prev.map((item) =>
           item._id === product._id
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
-      } else {
-        // If item is new, add with quantity 1
-        return [...prev, { ...product, quantity: 1 }];
       }
+      return [...prev, { ...product, quantity: 1 }];
     });
   };
 
-  // Remove a product from the cart (decrease quantity or remove completely)
   const removeFromCart = (productId) => {
     setCartItems((prev) => {
-      const existingItem = prev.find((item) => item._id === productId);
-      if (!existingItem) return prev;
-
-      if (existingItem.quantity > 1) {
-        // Decrease quantity by 1
+      const existing = prev.find((item) => item._id === productId);
+      if (!existing) return prev;
+      if (existing.quantity > 1) {
         return prev.map((item) =>
           item._id === productId
             ? { ...item, quantity: item.quantity - 1 }
             : item
         );
-      } else {
-        // If quantity is 1, remove the item completely
-        return prev.filter((item) => item._id !== productId);
       }
+      return prev.filter((item) => item._id !== productId);
     });
   };
 
-  // Clear all items from the cart
-  const clearCart = () => setCartItems([]);
+  const clearCart = () => {
+    setCartItems([]);
+    if (currentUserUid) {
+      localStorage.removeItem(`cart_${currentUserUid}`);
+    }
+  };
 
   return (
     <CartContext.Provider
-      value={{ cartItems, addToCart, removeFromCart, clearCart, totalPrice }} // Share totalPrice via context
+      value={{ cartItems, addToCart, removeFromCart, clearCart, totalPrice }}
     >
       {children}
     </CartContext.Provider>
