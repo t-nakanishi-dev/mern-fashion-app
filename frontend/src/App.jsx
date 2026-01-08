@@ -1,4 +1,7 @@
 // src/App.jsx
+
+// FINAL FIX: Removed duplicate registration - deployed 2026-01-09
+
 import React, { useEffect, useState } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import ProductList from "./components/ProductList";
