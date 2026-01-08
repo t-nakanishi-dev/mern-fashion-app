@@ -78,7 +78,6 @@ const SignUp = () => {
         <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
           新規登録
         </h2>
-
         <form
           onSubmit={handleSignUp}
           className="flex flex-col gap-4"
@@ -145,7 +144,10 @@ const SignUp = () => {
             登録する
           </button>
         </form>
-
+        // ページの一番下（form の後、return内のdivの中）などに追加
+        <div className="text-center text-red-600 font-bold mt-8">
+          最新バージョン確認用: 2026-01-08 v3 - 新しいデプロイ成功！
+        </div>
         {/* ログインリンク */}
         <p className="text-sm mt-4 text-center text-gray-600 dark:text-gray-300">
           すでにアカウントをお持ちですか？{" "}
