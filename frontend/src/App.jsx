@@ -1,5 +1,5 @@
 // src/App.jsx
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import ProductList from "./components/ProductList";
 import AddProduct from "./pages/AddProduct";
@@ -13,7 +13,6 @@ import PrivateRoute from "./components/PrivateRoute";
 import { signOut } from "firebase/auth";
 import { auth } from "./firebase";
 import { useAuth } from "./contexts/AuthContext";
-import { getFreshToken } from "./utils/getFreshToken";
 import Layout from "./components/Layout";
 import Profile from "./pages/Profile";
 import ConfirmOrder from "./pages/ConfirmOrder";
@@ -21,7 +20,6 @@ import OrderComplete from "./pages/OrderComplete";
 import MyOrders from "./pages/MyOrders";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminProductList from "./components/Admin/AdminProductList";
-import axios from "axios";
 import { LoadingProvider } from "./contexts/LoadingContext";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -29,14 +27,14 @@ import "react-toastify/dist/ReactToastify.css";
 function App() {
   const navigate = useNavigate();
 
-  // 🌙 ダークモード状態管理（初期値OK）
+  // 🌙 ダークモード状態管理
   const [isDark, setIsDark] = useState(() => {
     const saved = localStorage.getItem("dark-mode");
     if (saved !== null) return saved === "true";
     return window.matchMedia("(prefers-color-scheme: dark)").matches;
   });
 
-  // 🌙 ダークモード反映（修正済み）
+  // 🌙 ダークモード反映
   useEffect(() => {
     if (isDark) {
       document.documentElement.classList.add("dark");
@@ -47,14 +45,7 @@ function App() {
   }, [isDark]);
 
   // 🔐 認証情報
-  const {
-    user: mongoUser,
-    loading: authLoading,
-    isNewFirebaseUser,
-    userName,
-  } = useAuth();
-
-  const isRegistering = useRef(false);
+  const { user: mongoUser, loading: authLoading, userName } = useAuth();
 
   // 🚪 ログアウト
   const handleLogout = async () => {
@@ -67,48 +58,8 @@ function App() {
     }
   };
 
-  // 🧑‍💻 Firebase新規ユーザー → バックエンド登録
-  useEffect(() => {
-    if (!authLoading && isNewFirebaseUser && !isRegistering.current) {
-      const registerUserToBackend = async () => {
-        const firebaseUser = auth.currentUser;
-        if (!firebaseUser) return;
-
-        isRegistering.current = true;
-
-        try {
-          const token = await getFreshToken();
-          await axios.post(
-            `${import.meta.env.VITE_API_URL}/users`,
-            {
-              uid: firebaseUser.uid,
-              name:
-                userName ||
-                firebaseUser.displayName ||
-                firebaseUser.email.split("@")[0],
-              email: firebaseUser.email,
-            },
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-          console.log("バックエンドユーザー登録成功");
-        } catch (err) {
-          if (err.response?.status === 409) {
-            console.warn("ユーザーは既に登録されています");
-          } else {
-            console.error("バックエンドユーザー登録エラー:", err);
-          }
-        } finally {
-          isRegistering.current = false;
-        }
-      };
-
-      registerUserToBackend();
-    }
-  }, [authLoading, isNewFirebaseUser, userName]);
+  // ⭐ ここを削除：SignUp.jsx で既に登録処理をしているため不要
+  // （Firebase新規ユーザー自動登録の useEffect を完全に削除）
 
   const displayName = userName || "ゲスト";
   const userRole = mongoUser?.role || "guest";
@@ -132,7 +83,6 @@ function App() {
             >
               <Routes>
                 <Route path="/" element={<ProductList />} />
-
                 <Route
                   path="/add"
                   element={
@@ -141,7 +91,6 @@ function App() {
                     </PrivateRoute>
                   }
                 />
-
                 <Route
                   path="/profile"
                   element={
@@ -150,7 +99,6 @@ function App() {
                     </PrivateRoute>
                   }
                 />
-
                 <Route
                   path="/cart"
                   element={
@@ -159,7 +107,6 @@ function App() {
                     </PrivateRoute>
                   }
                 />
-
                 <Route
                   path="/confirm"
                   element={
@@ -168,7 +115,6 @@ function App() {
                     </PrivateRoute>
                   }
                 />
-
                 <Route
                   path="/complete"
                   element={
@@ -177,7 +123,6 @@ function App() {
                     </PrivateRoute>
                   }
                 />
-
                 <Route
                   path="/my-orders"
                   element={
@@ -186,7 +131,6 @@ function App() {
                     </PrivateRoute>
                   }
                 />
-
                 <Route
                   path="/admin"
                   element={
@@ -195,7 +139,6 @@ function App() {
                     </PrivateRoute>
                   }
                 />
-
                 <Route
                   path="/admin/products"
                   element={
@@ -204,7 +147,6 @@ function App() {
                     </PrivateRoute>
                   }
                 />
-
                 <Route
                   path="/edit/:id"
                   element={
@@ -213,7 +155,6 @@ function App() {
                     </PrivateRoute>
                   }
                 />
-
                 <Route path="/favorites" element={<Favorites />} />
                 <Route path="/products/:id" element={<ProductDetail />} />
               </Routes>
