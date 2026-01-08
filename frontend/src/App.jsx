@@ -1,7 +1,5 @@
 // src/App.jsx
-
 // FINAL FIX: Removed duplicate registration - deployed 2026-01-09
-
 import React, { useEffect, useState } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import ProductList from "./components/ProductList";
@@ -47,7 +45,7 @@ function App() {
     localStorage.setItem("dark-mode", isDark.toString());
   }, [isDark]);
 
-  // 🔐 認証情報
+  // 🔐 認証情報（isNewFirebaseUser はもう使わない）
   const { user: mongoUser, loading: authLoading, userName } = useAuth();
 
   // 🚪 ログアウト
@@ -61,8 +59,8 @@ function App() {
     }
   };
 
-  // ⭐ ここを削除：SignUp.jsx で既に登録処理をしているため不要
-  // （Firebase新規ユーザー自動登録の useEffect を完全に削除）
+  // ⭐ 自動バックエンド登録処理は完全に削除
+  // 新規登録は SignUp.jsx で完結させるため、ここでは何もしない
 
   const displayName = userName || "ゲスト";
   const userRole = mongoUser?.role || "guest";
@@ -70,6 +68,15 @@ function App() {
   return (
     <LoadingProvider>
       <ToastContainer />
+
+      {/* ⭐ デプロイ確認用バナー（これが見えたら最新コードが動いている！） */}
+      {/* 本番で動作確認後、このブロック全体を削除してください */}
+      <div className="fixed bottom-4 left-4 bg-green-600 text-white p-4 rounded-lg shadow-2xl z-50 font-bold text-lg">
+        ✅ FINAL VERSION DEPLOYED: 2026-01-09
+        <br />
+        Duplicate toast fixed! This banner will be removed soon.
+      </div>
+
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
