@@ -1,12 +1,7 @@
 // src/pages/SignUp.jsx
+console.log("This is the LATEST SignUp component - deployed on 2026-01-09");
 
-// FORCE NEW DEPLOY 2026-01-08 v2 - to fix old /api/signup
-console.log("This is the LATEST SignUp component - deployed on 2026-01-08");
-
-// TEMP: Force redeploy on 2026-01-08
-console.log("Force redeploy test");
-
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "../firebase";
 import { useNavigate, Link } from "react-router-dom";
@@ -19,6 +14,9 @@ const SignUp = () => {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+
+  // ⭐ toastが既に表示されたかを記録するフラグ
+  const hasShownSuccessToast = useRef(false);
 
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
@@ -38,6 +36,9 @@ const SignUp = () => {
   const handleSignUp = async (e) => {
     e.preventDefault();
     if (!validate()) return;
+
+    // ⭐ フラグをリセット（念のため毎回）
+    hasShownSuccessToast.current = false;
 
     try {
       const userCredential = await createUserWithEmailAndPassword(
@@ -60,7 +61,12 @@ const SignUp = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      toast.success("登録に成功しました！");
+      // ⭐ ここで1回だけtoastを表示（フラグでガード）
+      if (!hasShownSuccessToast.current) {
+        toast.success("登録に成功しました！");
+        hasShownSuccessToast.current = true;
+      }
+
       navigate("/");
     } catch (err) {
       console.error("登録エラー:", err);
@@ -144,11 +150,12 @@ const SignUp = () => {
             登録する
           </button>
         </form>
-        // ページの一番下（form の後、return内のdivの中）などに追加
+
+        {/* 確認用テキスト（本番前に削除OK） */}
         <div className="text-center text-red-600 font-bold mt-8">
-          最新バージョン確認用: 2026-01-08 v3 - 新しいデプロイ成功！
+          最新バージョン確認用: 2026-01-09 - 最終修正
         </div>
-        {/* ログインリンク */}
+
         <p className="text-sm mt-4 text-center text-gray-600 dark:text-gray-300">
           すでにアカウントをお持ちですか？{" "}
           <Link to="/login" className="text-blue-600 hover:underline">
