@@ -1,5 +1,8 @@
 // routes/userRoutes.js
 
+// TEMP: Force redeploy on 2026-01-08
+console.log("Force redeploy test");
+
 const express = require("express");
 const router = express.Router();
 const { verifyFirebaseToken } = require("../middleware/authMiddleware");

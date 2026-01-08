@@ -1,4 +1,8 @@
 // src/pages/SignUp.jsx
+
+// TEMP: Force redeploy on 2026-01-08
+console.log("Force redeploy test");
+
 import React, { useState } from "react";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "../firebase";
