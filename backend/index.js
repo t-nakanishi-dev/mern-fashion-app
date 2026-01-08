@@ -11,7 +11,7 @@ if (env === "production") {
   require("dotenv").config({ path: ".env.development", override: true });
 }
 
-// デバッグ用ログ（本番では削除してもOK）
+// デバッグ用ログ（本番では後で削除してもOK）
 console.log("🌍 Current NODE_ENV:", env);
 console.log("🔗 FRONTEND_URL:", process.env.FRONTEND_URL);
 
@@ -21,7 +21,6 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 
 // ✅ Import the initialized Firebase Admin SDK instance
-// This ensures the Admin SDK is only initialized once
 const admin = require("./firebaseAdmin");
 
 // ✅ Import route handlers
@@ -34,14 +33,20 @@ const salesRoutes = require("./routes/salesRoutes"); // ✅ 追加：売上集�
 // ✅ Create the Express app instance
 const app = express();
 
-// ✅ Configure CORS middleware
-// Only allow specified origins and enable credentials (cookies, auth headers, etc.)
+// ✅ Configure CORS middleware (修正部分)
+const allowedOrigins = ["http://localhost:5173"]; // ローカル開発用は固定
+
+// 本番フロントエンドURLが環境変数で設定されていれば追加
+if (process.env.FRONTEND_URL) {
+  allowedOrigins.push(process.env.FRONTEND_URL.trim());
+}
+
+// デバッグ用に許可リストを出力
+console.log("🌍 Allowed CORS origins:", allowedOrigins);
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173", // Local frontend for development
-      "https://mern-fashion-app-frontend.onrender.com", // Production frontend
-    ],
+    origin: allowedOrigins,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
   })
