@@ -1,5 +1,8 @@
 // src/pages/SignUp.jsx
 
+// FORCE NEW DEPLOY 2026-01-08 v2 - to fix old /api/signup
+console.log("This is the LATEST SignUp component - deployed on 2026-01-08");
+
 // TEMP: Force redeploy on 2026-01-08
 console.log("Force redeploy test");
 
