@@ -1,7 +1,5 @@
 // src/pages/SignUp.jsx
-console.log("This is the LATEST SignUp component - deployed on 2026-01-09");
-
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "../firebase";
 import { useNavigate, Link } from "react-router-dom";
@@ -9,48 +7,70 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 const SignUp = () => {
+  const navigate = useNavigate();
+
+  // フォーム状態
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  // バリデーションエラー
   const [errors, setErrors] = useState({});
-  const navigate = useNavigate();
 
-  // ⭐ toastが既に表示されたかを記録するフラグ
-  const hasShownSuccessToast = useRef(false);
-
-  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  // --------------------
+  // バリデーション
+  // --------------------
+  const validateEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
   const validate = () => {
     const newErrors = {};
-    if (!name.trim()) newErrors.name = "名前は必須です。";
-    if (!email) newErrors.email = "メールアドレスは必須です。";
-    else if (!validateEmail(email))
+
+    if (!name.trim()) {
+      newErrors.name = "名前は必須です。";
+    }
+
+    if (!email) {
+      newErrors.email = "メールアドレスは必須です。";
+    } else if (!validateEmail(email)) {
       newErrors.email = "メールアドレスの形式が正しくありません。";
-    if (!password) newErrors.password = "パスワードは必須です。";
-    else if (password.length < 6)
+    }
+
+    if (!password) {
+      newErrors.password = "パスワードは必須です。";
+    } else if (password.length < 6) {
       newErrors.password = "パスワードは6文字以上で入力してください。";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  // --------------------
+  // 新規登録処理
+  // --------------------
   const handleSignUp = async (e) => {
     e.preventDefault();
     if (!validate()) return;
 
-    // ⭐ フラグをリセット（念のため毎回）
-    hasShownSuccessToast.current = false;
-
     try {
+      // ① Firebase ユーザー作成
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
         password
       );
-      await updateProfile(userCredential.user, { displayName: name });
+
+      // ② displayName 設定
+      await updateProfile(userCredential.user, {
+        displayName: name,
+      });
 
       const user = userCredential.user;
+
+      // ③ ID トークン取得
       const token = await user.getIdToken();
 
+      // ④ バックエンドにユーザー登録
       await axios.post(
         `${import.meta.env.VITE_API_URL}/users`,
         {
@@ -58,90 +78,106 @@ const SignUp = () => {
           name: user.displayName || "No name",
           email: user.email,
         },
-        { headers: { Authorization: `Bearer ${token}` } }
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
-      // ⭐ ここで1回だけtoastを表示（フラグでガード）
-      if (!hasShownSuccessToast.current) {
-        toast.success("登録に成功しました！");
-        hasShownSuccessToast.current = true;
-      }
-
+      // ⑤ 成功通知 → 遷移
+      toast.success("登録に成功しました！");
       navigate("/");
     } catch (err) {
       console.error("登録エラー:", err);
-      if (err.response?.status === 409)
+
+      if (err.response?.status === 409) {
         toast.error(err.response.data.message || "既に登録されています。");
-      else if (err.code === "auth/email-already-in-use")
+      } else if (err.code === "auth/email-already-in-use") {
         toast.error("このメールアドレスは既に使用されています。");
-      else toast.error("登録に失敗しました。もう一度お試しください。");
+      } else {
+        toast.error("登録に失敗しました。もう一度お試しください。");
+      }
     }
   };
 
+  // --------------------
+  // JSX
+  // --------------------
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100 dark:bg-gray-800 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-800 p-4">
       <div className="w-full max-w-md p-6 border rounded shadow bg-white dark:bg-gray-700">
         <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
           新規登録
         </h2>
+
         <form
           onSubmit={handleSignUp}
           className="flex flex-col gap-4"
           noValidate
         >
-          <input
-            type="text"
-            placeholder="名前"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className={`p-2 border rounded w-full
-              bg-white text-gray-800 placeholder-gray-400
-              dark:bg-gray-700 dark:text-white dark:placeholder-gray-300
-              ${
-                errors.name
-                  ? "border-red-500 dark:border-red-400"
-                  : "border-gray-300 dark:border-gray-600"
-              }`}
-          />
-          {errors.name && (
-            <p className="text-red-600 text-sm mt-1">{errors.name}</p>
-          )}
+          {/* 名前 */}
+          <div>
+            <input
+              type="text"
+              placeholder="名前"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className={`p-2 border rounded w-full
+                bg-white text-gray-800 placeholder-gray-400
+                dark:bg-gray-700 dark:text-white dark:placeholder-gray-300
+                ${
+                  errors.name
+                    ? "border-red-500 dark:border-red-400"
+                    : "border-gray-300 dark:border-gray-600"
+                }`}
+            />
+            {errors.name && (
+              <p className="text-red-600 text-sm mt-1">{errors.name}</p>
+            )}
+          </div>
 
-          <input
-            type="email"
-            placeholder="メールアドレス"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className={`p-2 border rounded w-full
-              bg-white text-gray-800 placeholder-gray-400
-              dark:bg-gray-700 dark:text-white dark:placeholder-gray-300
-              ${
-                errors.email
-                  ? "border-red-500 dark:border-red-400"
-                  : "border-gray-300 dark:border-gray-600"
-              }`}
-          />
-          {errors.email && (
-            <p className="text-red-600 text-sm mt-1">{errors.email}</p>
-          )}
+          {/* メールアドレス */}
+          <div>
+            <input
+              type="email"
+              placeholder="メールアドレス"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className={`p-2 border rounded w-full
+                bg-white text-gray-800 placeholder-gray-400
+                dark:bg-gray-700 dark:text-white dark:placeholder-gray-300
+                ${
+                  errors.email
+                    ? "border-red-500 dark:border-red-400"
+                    : "border-gray-300 dark:border-gray-600"
+                }`}
+            />
+            {errors.email && (
+              <p className="text-red-600 text-sm mt-1">{errors.email}</p>
+            )}
+          </div>
 
-          <input
-            type="password"
-            placeholder="パスワード"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className={`p-2 border rounded w-full
-              bg-white text-gray-800 placeholder-gray-400
-              dark:bg-gray-700 dark:text-white dark:placeholder-gray-300
-              ${
-                errors.password
-                  ? "border-red-500 dark:border-red-400"
-                  : "border-gray-300 dark:border-gray-600"
-              }`}
-          />
-          {errors.password && (
-            <p className="text-red-600 text-sm mt-1">{errors.password}</p>
-          )}
+          {/* パスワード */}
+          <div>
+            <input
+              type="password"
+              placeholder="パスワード"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={`p-2 border rounded w-full
+                bg-white text-gray-800 placeholder-gray-400
+                dark:bg-gray-700 dark:text-white dark:placeholder-gray-300
+                ${
+                  errors.password
+                    ? "border-red-500 dark:border-red-400"
+                    : "border-gray-300 dark:border-gray-600"
+                }`}
+            />
+            {errors.password && (
+              <p className="text-red-600 text-sm mt-1">{errors.password}</p>
+            )}
+          </div>
 
           <button
             type="submit"
@@ -150,11 +186,6 @@ const SignUp = () => {
             登録する
           </button>
         </form>
-
-        {/* 確認用テキスト（本番前に削除OK） */}
-        <div className="text-center text-red-600 font-bold mt-8">
-          最新バージョン確認用: 2026-01-09 - 最終修正
-        </div>
 
         <p className="text-sm mt-4 text-center text-gray-600 dark:text-gray-300">
           すでにアカウントをお持ちですか？{" "}
