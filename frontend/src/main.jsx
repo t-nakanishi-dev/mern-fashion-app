@@ -1,7 +1,4 @@
 // src/main.jsx
-// React's StrictMode (helps detect potential problems during development)
-import { StrictMode } from "react";
-
 // API for creating a root in React 18+
 import { createRoot } from "react-dom/client";
 
@@ -26,35 +23,34 @@ import "./index.css";
 import App from "./App.jsx";
 
 // 📌 Render the application into the root DOM element
+// ✅ StrictMode を削除（本番環境では不要。二重実行・二重toastの原因になるため）
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    {/* 🌟 Manages the state of favorite items (e.g., heart icons) */}
-    <FavoriteProvider>
-      {/* 🧭 Handles client-side routing and navigation */}
-      <BrowserRouter>
-        {/* 🛒 Manages cart state (items, total amount, etc.) */}
-        <CartProvider>
-          {/* 🔐 Manages authentication state (logged-in user info, etc.) */}
-          <AuthProvider>
-            {/* 🧩 The main application component */}
-            <App />
-            {/* 💬 Displays toast notifications (success, error messages, etc.) */}
-            <ToastContainer
-              position="top-center"
-              autoClose={4000}
-              hideProgressBar={false}
-              newestOnTop={false}
-              closeOnClick
-              rtl={false}
-              pauseOnFocusLoss
-              draggable
-              pauseOnHover
-              theme="colored" 
-              className="mt-20" // ヘッダーと被らないように少し下げる
-            />
-          </AuthProvider>
-        </CartProvider>
-      </BrowserRouter>
-    </FavoriteProvider>
-  </StrictMode>
+  <FavoriteProvider>
+    {/* 🧭 Handles client-side routing and navigation */}
+    <BrowserRouter>
+      {/* 🛒 Manages cart state (items, total amount, etc.) */}
+      <CartProvider>
+        {/* 🔐 Manages authentication state (logged-in user info, etc.) */}
+        <AuthProvider>
+          {/* 🧩 The main application component */}
+          <App />
+
+          {/* 💬 Displays toast notifications (success, error messages, etc.) */}
+          <ToastContainer
+            position="top-center"
+            autoClose={4000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="colored"
+            className="mt-20" // ヘッダーと被らないように少し下げる
+          />
+        </AuthProvider>
+      </CartProvider>
+    </BrowserRouter>
+  </FavoriteProvider>
 );
