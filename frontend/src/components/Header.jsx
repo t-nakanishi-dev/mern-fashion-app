@@ -1,4 +1,3 @@
-// src/components/Header.jsx
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useCart } from "../contexts/CartContext";
@@ -102,7 +101,6 @@ const Header = ({ handleLogout, userName, userRole, isDark, setIsDark }) => {
 
             {/* デスクトップナビ */}
             <nav className="hidden lg:flex items-center gap-2">
-              {/* ここは完璧！（PC版は正しい） */}
               <button
                 onClick={() => setIsDark(!isDark)}
                 className="p-3 rounded-xl bg-white/10 hover:bg-white/20 transition-all hover:scale-110"
@@ -177,11 +175,20 @@ const Header = ({ handleLogout, userName, userRole, isDark, setIsDark }) => {
             </div>
           </div>
         </div>
+      </header>
 
-        {/* モバイルメニュー */}
-        {menuOpen && (
-          <div className="lg:hidden border-t border-purple-500/30 bg-gray-950/95 backdrop-blur-2xl">
-            <div className="px-6 py-8 space-y-5">
+      {/* モバイルメニュー（フルスクリーンオーバーレイ） */}
+      {menuOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
+          onClick={() => setMenuOpen(false)} // 外側クリックで閉じる
+        >
+          {/* メニュー本体（右寄せスライド） */}
+          <div
+            className="absolute top-0 right-0 bottom-0 w-4/5 max-w-xs bg-gray-950/95 backdrop-blur-2xl border-l border-purple-500/30 overflow-hidden shadow-2xl"
+            onClick={(e) => e.stopPropagation()} // メニュー内クリックは閉じない
+          >
+            <div className="h-full overflow-y-auto px-6 py-8 space-y-5 scrollbar-thin scrollbar-thumb-purple-500/50 scrollbar-track-gray-900/50 scrollbar-thumb-rounded-full">
               {/* ユーザー情報 */}
               <div className="flex items-center gap-4 pb-6 border-b border-purple-500/20">
                 <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center ring-4 ring-purple-500/30">
@@ -197,13 +204,12 @@ const Header = ({ handleLogout, userName, userRole, isDark, setIsDark }) => {
                 </div>
               </div>
 
-              {/* ここだけ修正！モバイルのダークモードボタン */}
+              {/* ダークモードボタン */}
               <button
                 onClick={() => setIsDark(!isDark)}
                 className="w-full flex items-center justify-between p-4 rounded-2xl bg-white/5 hover:bg-white/10 transition"
               >
                 <span className="flex items-center gap-3">
-                  {/* ここをPC版と同じに統一！ */}
                   {isDark ? (
                     <Sun className="w-5 h-5 text-yellow-400" />
                   ) : (
@@ -215,12 +221,12 @@ const Header = ({ handleLogout, userName, userRole, isDark, setIsDark }) => {
                       : "ダークモードに切り替え"}
                   </span>
                 </span>
-                {/* オプション：現在のモードをわかりやすく */}
                 <span className="text-xs text-purple-400 font-medium">
                   {isDark ? "ダーク" : "ライト"}
                 </span>
               </button>
 
+              {/* メニューアイテム */}
               <MobileNavLink
                 to="/favorites"
                 icon={<Heart className="w-6 h-6" />}
@@ -259,7 +265,8 @@ const Header = ({ handleLogout, userName, userRole, isDark, setIsDark }) => {
                   onClick={() => setMenuOpen(false)}
                 />
               )}
-              {/* ログアウトボタン */}
+
+              {/* ログアウト */}
               {userName && (
                 <button
                   onClick={() => {
@@ -274,8 +281,10 @@ const Header = ({ handleLogout, userName, userRole, isDark, setIsDark }) => {
               )}
             </div>
           </div>
-        )}
-      </header>
+        </div>
+      )}
+
+      {/* ヘッダーの高さ分スペース（固定ヘッダー対策） */}
       <div className="h-20" />
     </>
   );

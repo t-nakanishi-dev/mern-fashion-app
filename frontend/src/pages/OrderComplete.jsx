@@ -125,7 +125,7 @@ const OrderComplete = () => {
         </Link>
         <Link
           to="/"
-          className="inline-block text-blue-600 hover:underline text-lg"
+          className="inline-block bg-blue-600 text-white px-8 py-4 rounded-xl hover:bg-blue-700 transition"
         >
           ホームに戻る
         </Link>
