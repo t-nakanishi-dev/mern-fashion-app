@@ -1,8 +1,7 @@
-// backend/routes/payment.js
-
 const express = require("express");
 const Stripe = require("stripe");
 const dotenv = require("dotenv");
+const Product = require("../models/Product"); // ← Productモデルをインポート（必要に応じてパス修正）
 
 dotenv.config();
 
@@ -13,15 +12,32 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 router.post("/create-checkout-session", async (req, res) => {
   const { items } = req.body;
 
-  console.log("🛒 Received items for Stripe:", items); // ← デバッグ用に追加（重要！）
+  console.log("🛒 Received items for Stripe:", items);
 
   if (!items || items.length === 0) {
     return res.status(400).json({ error: "カートが空です" });
   }
 
   try {
+    // ★★★ 決済前に在庫チェックを実施 ★★★
+    for (const item of items) {
+      const product = await Product.findById(item._id || item.productId);
+
+      if (!product) {
+        return res.status(404).json({
+          error: `商品が見つかりません: ${item.name || "不明な商品"} (ID: ${item._id || item.productId})`,
+        });
+      }
+
+      if (product.countInStock < item.quantity) {
+        return res.status(400).json({
+          error: `在庫不足: "${product.name}" (残り ${product.countInStock} 個)`,
+        });
+      }
+    }
+
+    // 在庫OKの場合のみStripeセッションを作成
     const lineItems = items.map((item) => {
-      // name が存在しない場合のフォールバック
       const productName = item.name || item.product?.name || "不明な商品";
 
       if (!item.price || item.price <= 0) {
@@ -33,9 +49,9 @@ router.post("/create-checkout-session", async (req, res) => {
           currency: "jpy",
           product_data: {
             name: productName,
-            // images: item.imageUrl ? [item.imageUrl] : [], // 任意で画像も追加可能
+            // images: item.imageUrl ? [item.imageUrl] : [], // 任意
           },
-          unit_amount: Math.round(item.price), // 念のため整数に
+          unit_amount: Math.round(item.price),
         },
         quantity: item.quantity || 1,
       };
@@ -45,7 +61,7 @@ router.post("/create-checkout-session", async (req, res) => {
       payment_method_types: ["card"],
       mode: "payment",
       line_items: lineItems,
-      success_url: `${process.env.FRONTEND_URL}/complete`, // ← /complete じゃなくて /order-complete に合わせる
+      success_url: `${process.env.FRONTEND_URL}/complete`,
       cancel_url: `${process.env.FRONTEND_URL}/cart`,
     });
 
