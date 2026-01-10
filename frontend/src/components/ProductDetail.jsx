@@ -184,7 +184,7 @@ export default function ProductDetail() {
             </div>
 
             {product.description && (
-              <p className="text-gray-300 leading-relaxed text-lg whitespace-pre-line">
+              <p className="text-gray-400 leading-relaxed text-lg whitespace-pre-line">
                 {product.description}
               </p>
             )}
@@ -225,7 +225,7 @@ export default function ProductDetail() {
           </h2>
 
           {reviews.length === 0 ? (
-            <p className="text-center text-gray-500 py-16 text-xl">
+            <p className="text-center text-gray-400 py-16 text-xl">
               まだレビューがありません。最初のレビューをどうぞ！
             </p>
           ) : (

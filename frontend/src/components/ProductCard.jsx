@@ -75,14 +75,18 @@ const ProductCard = ({ product, onClick, isAdmin = false }) => {
 
         <div className="flex items-center justify-between text-xs text-gray-400">
           <span>by {product.createdBy?.name || "Unknown"}</span>
-          {product.stock <= 5 && product.stock > 0 && (
-            <span className="px-2 py-1 bg-orange-500/20 text-orange-400 rounded-full">
-              残り {product.stock}点
-            </span>
-          )}
-          {product.stock === 0 && (
+
+          {product.countInStock === 0 ? (
             <span className="px-2 py-1 bg-red-500/30 text-red-400 rounded-full">
               売り切れ
+            </span>
+          ) : product.countInStock <= 5 ? (
+            <span className="px-2 py-1 bg-orange-500/20 text-orange-400 rounded-full font-medium">
+              残り {product.countInStock}点
+            </span>
+          ) : (
+            <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded-full">
+              在庫あり
             </span>
           )}
         </div>
