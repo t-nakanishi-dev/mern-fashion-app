@@ -10,7 +10,7 @@ import {
   Package,
   Image,
   Tag,
-  DollarSign,
+  JapaneseYen,
   Type,
   CheckCircle,
 } from "lucide-react";
@@ -126,11 +126,6 @@ const AddProduct = () => {
           <h1 className="text-6xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-4">
             商品を追加
           </h1>
-          <p
-            className={`text-xl ${isDark ? "text-gray-400" : "text-gray-600"}`}
-          >
-            あなたの素晴らしい商品を世界に届けましょう
-          </p>
         </div>
 
         {/* メインカード */}
@@ -167,7 +162,7 @@ const AddProduct = () => {
                 <input
                   type="text"
                   name="name"
-                  placeholder="商品名（例：宇宙級Tシャツ）"
+                  placeholder="商品名"
                   value={form.name}
                   onChange={handleChange}
                   required
@@ -307,11 +302,12 @@ const AddProduct = () => {
 
               {/* 価格 */}
               <div className="relative">
-                <DollarSign className="absolute left-6 top-6 w-6 h-6 text-purple-400 z-10" />
+                <JapaneseYen className="absolute left-6 top-6 w-6 h-6 text-purple-400 z-10" />
                 <input
                   type="number"
                   name="price"
-                  placeholder="価格（例：9800）"
+                  inputMode="numeric"
+                  placeholder="価格（円・税込）"
                   value={form.price}
                   onChange={handleChange}
                   required

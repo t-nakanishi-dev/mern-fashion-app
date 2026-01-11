@@ -85,13 +85,8 @@ const ProductList = () => {
         {/* タイトル + 検索バー */}
         <div className="text-center mb-12">
           <h1 className="text-5xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-4">
-            TechShop
+            FashionStore
           </h1>
-          <p
-            className={`text-lg ${isDark ? "text-gray-400" : "text-gray-600"}`}
-          >
-            最新のガジェットが見つかる場所
-          </p>
 
           {/* 検索ボックス（Apple風・ライトモード対応） */}
           <div className="mt-8 max-w-2xl mx-auto relative">

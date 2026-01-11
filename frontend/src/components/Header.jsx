@@ -86,9 +86,8 @@ const Header = ({ handleLogout, userName, userRole, isDark, setIsDark }) => {
               </div>
               <div>
                 <h1 className="text-2xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                  TechShop
+                  FashionStore
                 </h1>
-                <p className="text-xs text-purple-300 -mt-1">Portfolio 2025</p>
               </div>
             </Link>
             {/* ロゴ モバイル */}
@@ -96,7 +95,7 @@ const Header = ({ handleLogout, userName, userRole, isDark, setIsDark }) => {
               <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl shadow-lg">
                 <Package className="w-6 h-6 text-white m-2" />
               </div>
-              <span className="text-xl font-bold text-white">TechShop</span>
+              <span className="text-xl font-bold text-white">FashionStore</span>
             </Link>
 
             {/* デスクトップナビ */}

@@ -241,8 +241,8 @@ export default function ProductDetail() {
                       {new Date(r.createdAt).toLocaleDateString("ja-JP")}
                     </p>
                   </div>
-                  <p className="text-gray-200">{r.comment}</p>
-                  <p className="text-sm text-purple-300 mt-3">
+                  <p className="text-gray-400">{r.comment}</p>
+                  <p className="text-sm text-purple-400 mt-3">
                     — {r.user?.name || "匿名ユーザー"}
                   </p>
                 </div>
@@ -256,7 +256,7 @@ export default function ProductDetail() {
               <h3 className="text-2xl font-bold mb-6 text-white">レビューを書く</h3>
               <form onSubmit={handleReviewSubmit} className="space-y-6">
                 <div>
-                  <label className="block text-lg mb-3 text-gray-300">評価</label>
+                  <label className="block text-lg mb-3 text-gray-500">評価</label>
                   <div className="flex gap-3">
                     {[5, 4, 3, 2, 1].map((n) => (
                       <button
@@ -277,7 +277,7 @@ export default function ProductDetail() {
                   placeholder="この商品はどうでしたか？"
                   rows="5"
                   required
-                  className="w-full px-6 py-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-purple-500/50"
+                  className="w-full px-6 py-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-purple-500/50"
                 />
 
                 <button
