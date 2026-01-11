@@ -1,3 +1,5 @@
+// src/pages/OrderComplete.jsx
+
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../contexts/CartContext";
@@ -116,16 +118,18 @@ const OrderComplete = () => {
       <p className="mb-6 text-lg">
         ご注文ありがとうございます。商品の発送まで今しばらくお待ちください。
       </p>
-      <div className="space-y-4">
+      <div className="flex flex-col items-center gap-8 mt-4">
+        {" "}
+        {/* gap-8 で確実 */}
         <Link
           to="/my-orders"
-          className="inline-block bg-purple-600 text-white px-8 py-4 rounded-xl hover:bg-purple-700 transition"
+          className="inline-block bg-purple-600 text-white px-8 py-4 rounded-xl hover:bg-purple-700 transition w-full max-w-xs"
         >
           注文履歴を確認する
         </Link>
         <Link
           to="/"
-          className="inline-block bg-blue-600 text-white px-8 py-4 rounded-xl hover:bg-blue-700 transition"
+          className="inline-block bg-blue-600 text-white px-8 py-4 rounded-xl hover:bg-blue-700 transition w-full max-w-xs"
         >
           ホームに戻る
         </Link>

@@ -158,19 +158,28 @@ const MyOrders = () => {
                     className="border-t border-gray-300 dark:border-gray-600 pt-4"
                   >
                     <div className="flex items-center gap-2 mb-2">
-                      {product?.imageUrl && (
+                      {/* ★★★ 修正：保存済みのimageUrlとnameを優先 ★★★ */}
+                      {item.imageUrl ? (
+                        <img
+                          src={item.imageUrl}
+                          alt={item.name || "商品画像"}
+                          loading="lazy"
+                          className="w-12 h-12 object-cover rounded border dark:border-gray-500"
+                        />
+                      ) : product?.imageUrl ? (
                         <img
                           src={product.imageUrl}
                           alt={product.name}
                           loading="lazy"
                           className="w-12 h-12 object-cover rounded border dark:border-gray-500"
                         />
-                      )}
+                      ) : null}
+
                       <span>
-                        {product?.name || "商品名不明"} × {item.quantity}
+                        {item.name || product?.name || "商品名不明"} ×{" "}
+                        {item.quantity}
                       </span>
                     </div>
-
                     {!alreadyReviewed && productId && (
                       <div className="mt-2 space-y-2">
                         <select
@@ -206,7 +215,6 @@ const MyOrders = () => {
                         </button>
                       </div>
                     )}
-
                     {alreadyReviewed && (
                       <p className="text-green-600 dark:text-green-400 text-sm mt-1">
                         ✅ レビュー済み

@@ -24,7 +24,6 @@ router.post("/save-order", verifyFirebaseOnly, async (req, res) => {
     const processedItems = [];
     let calculatedTotalPrice = 0;
 
-    // Iterate through each item and update inventory
     for (const item of items) {
       const product = await Product.findById(item.productId);
 
@@ -47,6 +46,9 @@ router.post("/save-order", verifyFirebaseOnly, async (req, res) => {
         productId: item.productId,
         quantity: item.quantity,
         price: product.price,
+        // ★★★ ここを追加 ★★★
+        name: product.name,
+        imageUrl: product.imageUrl || null, // nullでもOK（画像がない商品の場合）
       });
 
       calculatedTotalPrice += product.price * item.quantity;
@@ -54,9 +56,7 @@ router.post("/save-order", verifyFirebaseOnly, async (req, res) => {
 
     const userInDb = await User.findOne({ uid: req.user.uid });
     if (!userInDb) {
-      return res
-        .status(404)
-        .json({ message: "User not found for placing the order." });
+      return res.status(404).json({ message: "User not found." });
     }
 
     const newOrder = new Order({
@@ -68,19 +68,13 @@ router.post("/save-order", verifyFirebaseOnly, async (req, res) => {
     console.log("--- 💾 データベース保存直前 ---");
     console.log("保存する注文データ:", newOrder);
 
-    // **Nested try...catch for specific database errors**
     try {
       await newOrder.save();
-      console.log(
-        "🎉 Order successfully saved to MongoDB. Order ID:",
-        newOrder._id
-      );
+      console.log("🎉 Order saved. ID:", newOrder._id);
     } catch (dbSaveErr) {
-      console.error("--- 🚨 データベース保存エラー ---");
-      console.error("詳細:", dbSaveErr);
-      // Return a 500 status code with a specific error message
+      console.error("データベース保存エラー:", dbSaveErr);
       return res.status(500).json({
-        error: "Failed to save order to database.",
+        error: "Failed to save order",
         details: dbSaveErr.message,
       });
     }
@@ -111,10 +105,7 @@ router.post("/save-order", verifyFirebaseOnly, async (req, res) => {
 
     res.status(200).json({ message: "Order saved successfully" });
   } catch (err) {
-    console.error("--- 🚨 全体的な注文保存エラー ---");
-    console.error("🔥🔥🔥 Order Save Error:", err);
-    console.error("エラー名:", err.name);
-    console.error("エラーメッセージ:", err.message);
+    console.error("注文保存全体エラー:", err);
     res.status(500).json({ error: "Failed to save order" });
   }
 });
