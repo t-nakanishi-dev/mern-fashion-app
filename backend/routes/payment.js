@@ -12,8 +12,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 router.post("/create-checkout-session", async (req, res) => {
   const { items } = req.body;
 
-  console.log("🛒 Received items for Stripe:", items);
-
   if (!items || items.length === 0) {
     return res.status(400).json({ error: "カートが空です" });
   }
@@ -64,9 +62,6 @@ router.post("/create-checkout-session", async (req, res) => {
       success_url: `${process.env.FRONTEND_URL}/complete`,
       cancel_url: `${process.env.FRONTEND_URL}/cart`,
     });
-
-    console.log("✅ Stripe Checkout Session Created:", session.id);
-
     res.json({ id: session.id });
   } catch (error) {
     console.error("❌ Stripe Checkout Session Error:", error);

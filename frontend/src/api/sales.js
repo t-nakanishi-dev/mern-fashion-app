@@ -1,6 +1,6 @@
 // src/api/sales.js
 import axios from "axios";
-import { toast } from "react-toastify"; // またはプロジェクトで使っている showError / toast ライブラリ
+import { toast } from "react-toastify";
 
 export const fetchDailySales = async () => {
   try {
@@ -9,7 +9,7 @@ export const fetchDailySales = async () => {
   } catch (error) {
     console.error("日次売上データの取得に失敗しました:", error);
 
-    // ユーザー向けエラーメッセージ（プロジェクトのトーストスタイルに合わせる）
+    // ユーザー向けエラーメッセージ
     toast.error(
       "売上データの取得に失敗しました。しばらくしてから再度お試しください。"
     );

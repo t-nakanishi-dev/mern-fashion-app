@@ -22,7 +22,6 @@ const verifyFirebaseOnly = async (req, res, next) => {
     const decoded = await admin.auth().verifyIdToken(token);
 
     // ✅ If the token is valid, attach the decoded user information to req.user
-    console.log("✅ Firebase decoded user:", decoded);
     req.user = decoded;
 
     // Proceed to the next middleware or route handler

@@ -7,14 +7,9 @@ const { verifyFirebaseToken } = require("../middleware/authMiddleware");
 const adminCheck = require("../middleware/adminCheck");
 const Order = require("../models/Order");
 
-// --- 変更点ここから ---
-
 // ✅ Admin only: Get all products (for admin panel) - 固定パスは先に
 router.get("/admin", verifyFirebaseToken, adminCheck, async (req, res) => {
   try {
-    console.log(
-      "DEBUG: GET /api/products/admin (管理者用商品一覧) ルートに到達しました。"
-    );
     const products = await Product.find().populate({
       path: "createdBy",
       select: "name", // Show creator name
@@ -29,9 +24,6 @@ router.get("/admin", verifyFirebaseToken, adminCheck, async (req, res) => {
 // 📌 Get all products created by the logged-in user - 固定パスは先に
 router.get("/mine", verifyFirebaseToken, async (req, res) => {
   try {
-    console.log(
-      "DEBUG: GET /api/products/mine (ユーザー作成商品) ルートに到達しました。"
-    );
     // Filter products by creator ID (current user)
     const products = await Product.find({ createdBy: req.user._id });
     res.json(products);
@@ -44,15 +36,12 @@ router.get("/mine", verifyFirebaseToken, async (req, res) => {
 // ✅ Public: Get ALL products (accessible to anyone) ← ここを修正！
 router.get("/", async (req, res) => {
   try {
-    console.log(
-      "DEBUG: GET /api/products (すべての商品) ルートに到達しました。"
-    );
     const products = await Product.find({})
       .populate({
         path: "createdBy",
         select: "name", // nameだけ取得して負荷軽減
       })
-      .sort({ createdAt: -1 }); // 最新順に並べると見栄え良し（任意）
+      .sort({ createdAt: -1 }); 
 
     res.json(products);
   } catch (err) {
@@ -64,9 +53,6 @@ router.get("/", async (req, res) => {
 // ✅ Public: Get product by ID (accessible to anyone) - パスパラメータを持つルートは後に
 router.get("/:id", async (req, res) => {
   try {
-    console.log(
-      `DEBUG: GET /api/products/${req.params.id} (個別商品) ルートに到達しました。`
-    );
     const product = await Product.findById(req.params.id)
       .populate("createdBy", "name")
       .populate("reviews.user", "name");
@@ -84,8 +70,6 @@ router.get("/:id", async (req, res) => {
     res.status(500).json({ message: "Failed to fetch product details" });
   }
 });
-
-// --- 変更点ここまで ---
 
 // 📌 Create a new product (only available to logged-in users)
 router.post("/", verifyFirebaseToken, async (req, res) => {

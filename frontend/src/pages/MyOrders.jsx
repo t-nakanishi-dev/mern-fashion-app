@@ -158,7 +158,6 @@ const MyOrders = () => {
                     className="border-t border-gray-300 dark:border-gray-600 pt-4"
                   >
                     <div className="flex items-center gap-2 mb-2">
-                      {/* ★★★ 修正：保存済みのimageUrlとnameを優先 ★★★ */}
                       {item.imageUrl ? (
                         <img
                           src={item.imageUrl}

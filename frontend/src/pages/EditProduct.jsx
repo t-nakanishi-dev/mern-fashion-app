@@ -1,4 +1,4 @@
-// src/pages/EditProduct.jsx （最終版・完全修正済み）
+// src/pages/EditProduct.jsx 
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
@@ -122,11 +122,6 @@ const EditProduct = () => {
           <h1 className="text-6xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-4">
             商品を編集
           </h1>
-          <p
-            className={`text-xl ${isDark ? "text-gray-400" : "text-gray-600"}`}
-          >
-            より魅力的にアップデートしましょう
-          </p>
         </div>
 
         <div
@@ -282,7 +277,7 @@ const EditProduct = () => {
                 </div>
               )}
 
-              {/* 価格 - ここが修正！ */}
+              {/* 価格 */}
               <div className="relative">
                 <DollarSign className="absolute left-6 top-6 w-6 h-6 text-purple-400 z-10" />
                 <input

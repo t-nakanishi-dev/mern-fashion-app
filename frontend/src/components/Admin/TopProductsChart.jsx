@@ -73,7 +73,7 @@ const TopProductsChart = ({ token }) => {
       <ResponsiveContainer width="100%" height={380}>
         <BarChart
           data={topProducts}
-          layout="vertical" // ← ここを vertical に戻す（これが正解！）
+          layout="vertical" 
           margin={{ top: 10, right: 30, left: 80, bottom: 10 }}
         >
           <CartesianGrid

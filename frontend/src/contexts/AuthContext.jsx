@@ -38,13 +38,6 @@ export const AuthProvider = ({ children }) => {
           // ★ Force token refresh to ensure updated custom claims
           const token = await firebaseUser.getIdToken(true);
 
-          // Debug log for development
-          console.log("🛡 Firebase User Info:");
-          console.log("UID:", firebaseUser.uid);
-          console.log("Email:", firebaseUser.email);
-          console.log("Display Name:", firebaseUser.displayName);
-          console.log("ID Token:", token);
-
           setToken(token);
 
           // Fetch user data from MongoDB API using the token

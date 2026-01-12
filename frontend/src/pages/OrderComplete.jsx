@@ -120,7 +120,6 @@ const OrderComplete = () => {
       </p>
       <div className="flex flex-col items-center gap-8 mt-4">
         {" "}
-        {/* gap-8 で確実 */}
         <Link
           to="/my-orders"
           className="inline-block bg-purple-600 text-white px-8 py-4 rounded-xl hover:bg-purple-700 transition w-full max-w-xs"

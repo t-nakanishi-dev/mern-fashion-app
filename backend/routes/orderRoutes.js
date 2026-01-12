@@ -10,14 +10,8 @@ const sendEmail = require("../utils/sendEmail");
 
 const router = express.Router();
 
-console.log("✅ orderRoutes.js loaded and router initialized.");
-
 // 🔽 Route for saving an order and updating inventory
 router.post("/save-order", verifyFirebaseOnly, async (req, res) => {
-  console.log("--- 🏁 注文保存リクエスト受信 ---");
-  console.log("📦 Order request body:", req.body);
-  console.log("👤 UID:", req.user.uid);
-
   const { items } = req.body;
 
   try {
@@ -65,12 +59,8 @@ router.post("/save-order", verifyFirebaseOnly, async (req, res) => {
       totalPrice: calculatedTotalPrice,
     });
 
-    console.log("--- 💾 データベース保存直前 ---");
-    console.log("保存する注文データ:", newOrder);
-
     try {
       await newOrder.save();
-      console.log("🎉 Order saved. ID:", newOrder._id);
     } catch (dbSaveErr) {
       console.error("データベース保存エラー:", dbSaveErr);
       return res.status(500).json({
@@ -112,9 +102,6 @@ router.post("/save-order", verifyFirebaseOnly, async (req, res) => {
 
 // 🔽 Route to get order history for the logged-in user
 router.get("/my-orders", verifyFirebaseOnly, async (req, res) => {
-  console.log("➡️ GET /api/orders/my-orders endpoint hit.");
-  console.log("👤 UID for fetching orders:", req.user.uid);
-
   try {
     const userInDb = await User.findOne({ uid: req.user.uid });
     if (!userInDb) {
@@ -128,8 +115,6 @@ router.get("/my-orders", verifyFirebaseOnly, async (req, res) => {
         select: "name imageUrl reviews",
       })
       .sort({ createdAt: -1 });
-
-    console.log(`✅ Retrieved ${orders.length} orders.`);
     res.status(200).json(orders);
   } catch (err) {
     console.error("❌ Error fetching order history:", err);
@@ -139,7 +124,6 @@ router.get("/my-orders", verifyFirebaseOnly, async (req, res) => {
 
 // 🔽 Route for admin to get all orders (admin access only)
 router.get("/", verifyFirebaseOnly, adminCheck, async (req, res) => {
-  console.log("➡️ GET /api/orders (admin) endpoint hit.");
   try {
     const { status, userName, sort } = req.query;
 
@@ -164,8 +148,6 @@ router.get("/", verifyFirebaseOnly, adminCheck, async (req, res) => {
       .populate({ path: "userUid", select: "name" })
       .populate({ path: "items.productId", select: "name imageUrl" })
       .sort({ createdAt: sortOrder });
-
-    console.log(`✅ Admin retrieved ${orders.length} orders.`);
     res.json(orders);
   } catch (err) {
     console.error("❌ Error fetching filtered orders:", err);
@@ -201,10 +183,6 @@ router.patch("/:id/status", verifyFirebaseOnly, async (req, res) => {
 
     order.status = status;
     const updatedOrder = await order.save();
-
-    console.log(
-      `📝 注文 ${order._id} のステータスを「${status}」に更新しました`
-    );
 
     res.status(200).json({
       message: "注文ステータスを更新しました",

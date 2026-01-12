@@ -28,7 +28,7 @@ const AddProduct = () => {
     price: "",
   });
 
-  // リアルタイムでダークモードを監視（完璧！）
+  // リアルタイムでダークモードを監視
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
@@ -174,7 +174,6 @@ const AddProduct = () => {
                 />
               </div>
 
-              {/* カテゴリ選択 - これで絶対に文字が見える！ */}
               <div className="relative group">
                 <Tag className="absolute left-6 top-6 w-6 h-6 text-purple-400 z-10" />
                 <select

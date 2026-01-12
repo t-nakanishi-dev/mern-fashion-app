@@ -14,7 +14,6 @@ const CategorySalesChart = ({ token }) => {
   const [categorySales, setCategorySales] = useState([]);
   const [error, setError] = useState(null);
 
-  // ダークモード対応（SalesChartと統一）
   const [isDark, setIsDark] = useState(false);
   useEffect(() => {
     const update = () =>
@@ -28,7 +27,6 @@ const CategorySalesChart = ({ token }) => {
     return () => observer.disconnect();
   }, []);
 
-  // ダッシュボードに合う美しいカラーセット（紫〜ピンク基調）
   const COLORS = isDark
     ? ["#c084fc", "#ec4899", "#f472b6", "#f687b3", "#fcd34d"]
     : ["#a78bfa", "#e879f9", "#f0abfc", "#fdb4c4", "#fde047"];

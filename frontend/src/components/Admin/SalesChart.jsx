@@ -101,7 +101,6 @@ const SalesChart = ({ token }) => {
         </BarChart>
       </ResponsiveContainer>
 
-      {/* 総売上を小さく表示（邪魔にならない程度に） */}
       <div className={`mt-4 pt-4 border-t ${isDark ? "border-white/10" : "border-gray-200"} text-right`}>
         <span className={`text-sm ${isDark ? "text-gray-400" : "text-gray-600"}`}>
           期間合計：

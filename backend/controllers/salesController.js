@@ -104,5 +104,5 @@ const getMonthlySales = async (req, res) => {
 module.exports = {
   getTopSellingProducts,
   getCategorySales,
-  getMonthlySales, // ← 追加
+  getMonthlySales, 
 };

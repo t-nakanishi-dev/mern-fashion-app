@@ -1,8 +1,4 @@
 // routes/userRoutes.js
-
-// TEMP: Force redeploy on 2026-01-08
-console.log("Force redeploy test");
-
 const express = require("express");
 const router = express.Router();
 const { verifyFirebaseToken } = require("../middleware/authMiddleware");
@@ -59,48 +55,27 @@ router.post("/", async (req, res) => {
 // Also syncs the role in Firebase custom claims with the role in the DB.
 // ================================
 router.get("/me", verifyFirebaseToken, async (req, res) => {
-  console.log("🚀 GET /api/users/me endpoint hit.");
-  console.log("👤 User from token (req.user):", req.user);
-
   try {
-    console.log("Attempting to find user in DB with UID:", req.user.uid);
     const user = await User.findOne({ uid: req.user.uid });
-    console.log("Fetched user from DB:", user);
-
     if (!user) {
-      console.log("User not found in DB for UID:", req.user.uid);
       return res.status(404).json({ message: "User not found" });
     }
 
     // Sync role between DB and Firebase custom claims if different
     const firebaseUserRecord = await admin.auth().getUser(req.user.uid);
     const currentCustomClaims = firebaseUserRecord.customClaims;
-    console.log(
-      "ℹ️ Current Firebase Custom Claims from record:",
-      currentCustomClaims
-    );
-
     if (
       user.role &&
       (!currentCustomClaims || currentCustomClaims.role !== user.role)
     ) {
-      console.log(
-        `💡 Updating Firebase custom claims for UID: ${user.uid} to role: ${user.role}`
-      );
       await admin.auth().setCustomUserClaims(user.uid, { role: user.role });
-      console.log("✅ Firebase custom claims updated.");
     } else if (!user.role && currentCustomClaims && currentCustomClaims.role) {
-      console.log(
-        `💡 Clearing Firebase custom claims for UID: ${user.uid} (no role in DB)`
-      );
       await admin.auth().setCustomUserClaims(user.uid, {}); // Clear the role claim
-      console.log("✅ Firebase custom claims cleared.");
     } else {
       console.log("ℹ️ Firebase custom claims already up to date.");
     }
 
     res.json(user);
-    console.log("✅ User data sent to frontend.");
   } catch (error) {
     console.error("❌ Error fetching user info:", error);
     res.status(500).json({

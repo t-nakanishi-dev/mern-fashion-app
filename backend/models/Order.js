@@ -17,10 +17,8 @@ const orderItemSchema = new mongoose.Schema({
     required: true,
     min: [0, "Price must be at least 0"],
   },
-  // ★★★ ここを追加 ★★★
   name: {
     type: String,
-    // required: false でもOKですが、保存時に必ず入れることを推奨
   },
   imageUrl: {
     type: String,

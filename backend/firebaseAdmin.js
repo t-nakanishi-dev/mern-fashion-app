@@ -37,9 +37,6 @@ if (base64Key) {
 } else if (fs.existsSync(serviceAccountPath)) {
   // If the key file exists locally, read and parse it
   serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, "utf8"));
-  console.log(
-    "Firebase Admin SDK: Initialized using serviceAccountKey.json file."
-  );
 } else {
   // If neither source is available, throw an error
   throw new Error(
@@ -52,7 +49,6 @@ if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
   });
-  console.log("✅ Firebase Admin SDK initialized successfully.");
 }
 
 module.exports = admin; // Export the initialized admin instance for use in other modules

@@ -11,7 +11,7 @@ const AdminFilters = ({ filters, setFilters, onFilterApply }) => {
     }));
   };
 
-  // ダークモード検知（AddProduct・EditProduct・AdminDashboardと統一）
+  // ダークモード検知
   const [isDark, setIsDark] = useState(false);
   useEffect(() => {
     const update = () =>

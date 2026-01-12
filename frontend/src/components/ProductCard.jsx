@@ -3,7 +3,7 @@ import React from "react";
 import { useFavorite } from "../contexts/FavoriteContext";
 import { useCart } from "../contexts/CartContext";
 import { Heart, ShoppingCart } from "lucide-react";
-import { showSuccess } from "../utils/showToast"; // ← これを追加
+import { showSuccess } from "../utils/showToast"; 
 
 const ProductCard = ({ product, onClick, isAdmin = false }) => {
   const { toggleFavorite, isFavorite } = useFavorite();

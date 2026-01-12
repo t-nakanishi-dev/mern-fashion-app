@@ -248,7 +248,7 @@ const AdminDashboard = () => {
               ホームに戻る
             </Link>
 
-            {/* 商品一覧（旧AdminProductListの代わり） */}
+            {/* 商品一覧 */}
             <section>
               <h2 className="text-3xl font-bold mb-6 flex items-center gap-4">
                 <Package className="w-9 h-9 text-purple-400" />
@@ -257,7 +257,7 @@ const AdminDashboard = () => {
               <AdminProductList products={products} />
             </section>
 
-            {/* 在庫管理テーブル（美しくリデザイン） */}
+            {/* 在庫管理テーブル */}
             <section>
               <h2 className="text-3xl font-bold mb-6 flex items-center gap-4">
                 <Package className="w-9 h-9 text-pink-400" />
@@ -409,7 +409,7 @@ const AdminDashboard = () => {
               </div>
             </section>
 
-            {/* グラフたち */}
+            {/* グラフ */}
             <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div
                 className={`rounded-2xl backdrop-blur-md border ${

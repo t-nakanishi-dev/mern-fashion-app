@@ -8,7 +8,7 @@ import { showError } from "../utils/showToast";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState({}); // バリデーションエラー管理
+  const [errors, setErrors] = useState({}); 
   const navigate = useNavigate();
 
   // メール形式チェック用の簡易正規表現

@@ -185,7 +185,7 @@ const Header = ({ handleLogout, userName, userRole, isDark, setIsDark }) => {
           {/* メニュー本体（右寄せスライド） */}
           <div
             className="absolute top-0 right-0 bottom-0 w-4/5 max-w-xs bg-gray-950/95 backdrop-blur-2xl border-l border-purple-500/30 overflow-hidden shadow-2xl"
-            onClick={(e) => e.stopPropagation()} // メニュー内クリックは閉じない
+            onClick={(e) => e.stopPropagation()} 
           >
             <div className="h-full overflow-y-auto px-6 py-8 space-y-5 scrollbar-thin scrollbar-thumb-purple-500/50 scrollbar-track-gray-900/50 scrollbar-thumb-rounded-full">
               {/* ユーザー情報 */}
