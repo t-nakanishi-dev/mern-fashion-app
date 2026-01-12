@@ -1,31 +1,32 @@
 # 🛍️ MERN Fashion App – ファッションECサイト
 
 ## 🔗 デプロイURL
-https://mern-fashion-app.onrender.com  
+https://mern-fashion-app-frontend-8qxk.onrender.com
 ※スマートフォン・PCの両方に対応しています。
 
 ## 🔑 テストログイン
-Email: test@gmail.com  
-Password: test  
+Email: t.nakanishi.dev@gmail.com
+Password: t.nakanishi.dev  
 
 ## 📸 スクリーンショット
-**ホーム画面**  
-（おすすめ商品・新着アイテム一覧のスクリーンショット）
 
-**商品詳細画面**  
-（商品画像、価格、サイズ選択、カート追加ボタンなど）
+### ホーム画面
+![ホーム画面](./screenshots/home.png)
 
-**カート画面**  
-（追加した商品の一覧と合計金額）
+### 商品詳細画面
+![商品詳細画面](./screenshots/product-detail.png)
 
-**注文完了画面**  
-（購入完了メッセージのスクリーンショット）
+### カート画面
+![カート画面](./screenshots/cart.png)
 
-**お気に入り画面**  
-（保存したお気に入り商品一覧のスクリーンショット）
+### 注文完了画面
+![注文完了画面](./screenshots/checkout-complete.png)
 
-**商品検索画面**  
-（検索バーとフィルタ機能で商品の検索結果を表示）
+### お気に入り画面
+![お気に入り画面](./screenshots/favorites.png)
+
+### 商品検索画面
+![商品検索画面](./screenshots/search.png)
 
 ## 📝 アプリ概要
 このアプリは、最新のファッションアイテムを閲覧・購入できる  
@@ -63,5 +64,5 @@ MERNスタックを用いたフルスタックECサイトです。
 - 商品検索バーで名前やカテゴリーで絞り込みができ、ユーザーの利便性を向上  
 
 ## 👤 作者情報
-- 名前：PiyoCode324  
-- GitHub：[https://github.com/PiyoCode324](https://github.com/PiyoCode324)
+- 名前：t-nakanishi-dev
+- GitHub：https://github.com/t-nakanishi-dev
